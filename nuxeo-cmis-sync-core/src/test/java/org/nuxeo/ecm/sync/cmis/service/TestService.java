@@ -24,6 +24,7 @@ import static org.junit.Assert.assertNotNull;
 import javax.inject.Inject;
 
 import org.apache.chemistry.opencmis.client.api.Session;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nuxeo.ecm.sync.cmis.api.CMISRemoteService;
@@ -40,6 +41,7 @@ import org.nuxeo.runtime.test.runner.RuntimeFeature;
 @RunWith(FeaturesRunner.class)
 @Features(RuntimeFeature.class)
 @Deploy({ "org.nuxeo.ecm.sync.cmis", "org.nuxeo.ecm.sync.cmis:OSGI-INF/cmis-repository-test-contribs.xml" })
+@Ignore
 public class TestService {
 
   @Inject
