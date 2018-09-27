@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<component name="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent">
+  <implementation class="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent" />
+
+  <documentation>
+    @author Damon Brown (dbrown@nuxeo.com)
+  </documentation>
+
+  <service>
+    <provide interface="org.nuxeo.ecm.sync.cmis.api.CMISRemoteService" />
+  </service>
+
+  <extension-point name="mapping">
+    <documentation>
+      example:
+      <code>
+        <mapping name="" xpath="" property="" doctype=""/>
+      </code>
+    </documentation>
+    <object class="org.nuxeo.ecm.sync.cmis.service.CMISMappingDescriptor" />
+  </extension-point>
+
+  <extension-point name="repository">
+    <documentation>
+      example:
+      <code>
+        <repository name="" enabled="true" binding="">
+          <repository></repository>
+          <url></url>
+          <username></username>
+          <credentials></credentials>
+          <property key=""></property>
+        </repository>
+      </code>
+    </documentation>
+    <object class="org.nuxeo.ecm.sync.cmis.service.CMISRepositoryDescriptor" />
+  </extension-point>
+
+</component>
