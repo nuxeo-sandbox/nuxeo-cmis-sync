@@ -16,6 +16,7 @@ import org.nuxeo.ecm.automation.core.annotations.Context;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
 import org.nuxeo.ecm.automation.core.annotations.OperationMethod;
 import org.nuxeo.ecm.automation.core.annotations.Param;
+import org.nuxeo.ecm.automation.core.collectors.DocumentModelCollector;
 import org.nuxeo.ecm.automation.core.util.DocumentHelper;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.Blobs;
@@ -44,9 +45,6 @@ public class CMISSync extends CMISOperations {
   @Param(name = "connection", required = false)
   protected String connection;
 
-  @Param(name = "path", required = true)
-  protected String localPath;
-
   @Param(name = "remoteRef", required = false)
   protected String remoteRef;
 
@@ -65,13 +63,13 @@ public class CMISSync extends CMISOperations {
   @Param(name = "contentXPath", required = false, values = "file:content")
   protected String contentXPath = "file:content";
 
-  @OperationMethod
-  public DocumentModel run() {
+  @OperationMethod(collector = DocumentModelCollector.class)
+  public DocumentModel run(DocumentModel target) {
 
     // Get document, check facet
     AtomicReference<String> remoteRef = new AtomicReference<>(this.remoteRef);
     AtomicBoolean idRef = new AtomicBoolean(this.idRef);
-    DocumentModel model = loadDocument(this.session, this.localPath, remoteRef, idRef);
+    DocumentModel model = loadDocument(this.session, target, remoteRef, idRef);
 
     // Validate repository
     Property p = model.getProperty(SYNC_DATA);

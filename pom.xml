@@ -7,16 +7,15 @@
     <artifactId>nuxeo-distribution</artifactId>
     <version>10.2</version>
   </parent>
-
   <groupId>org.nuxeo.ecm.sync.cmis</groupId>
   <artifactId>nuxeo-cmis-sync</artifactId>
   <version>10.2-SNAPSHOT</version>
-  <name>Nuxeo cmis sync</name>
-  <description>CMIS Synchronization</description>
+  <name>Nuxeo CMIS Sync</name>
   <packaging>pom</packaging>
 
   <modules>
     <module>nuxeo-cmis-sync-core</module>
+    <module>nuxeo-cmis-sync-web-ui</module>
     <module>nuxeo-cmis-sync-package</module>
   </modules>
 
@@ -77,6 +76,11 @@
       <dependency>
         <groupId>org.nuxeo.ecm.sync.cmis</groupId>
         <artifactId>nuxeo-cmis-sync-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+       <dependency>
+        <groupId>org.nuxeo.ecm.sync.cmis</groupId>
+        <artifactId>nuxeo-cmis-sync-web-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

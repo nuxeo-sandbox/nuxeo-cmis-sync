@@ -65,7 +65,7 @@ public class TestCMISSync {
     OperationChain chain = new OperationChain("testChain");
     chain.add(FetchContextDocument.ID);
     chain.add(CreateDocument.ID).set("type", "File").set("name", "file").set("properties", "dc:title=MyDoc");
-    chain.add(CMISSync.ID).set("connection", "test").set("path", path).set("remoteRef", remote);
+    chain.add(CMISSync.ID).set("connection", "test").set("remoteRef", remote);
 
     DocumentModel doc = (DocumentModel) service.run(ctx, chain);
     assertEquals(path, doc.getPathAsString());

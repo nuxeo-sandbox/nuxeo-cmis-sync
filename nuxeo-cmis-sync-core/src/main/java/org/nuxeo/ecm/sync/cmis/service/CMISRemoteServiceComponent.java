@@ -1,5 +1,7 @@
 package org.nuxeo.ecm.sync.cmis.service;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +73,11 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
   @Override
   public List<CMISMappingDescriptor> getMappings(String doctype) {
     return this.mappings.values().stream().filter(m -> m.matches(doctype)).collect(Collectors.toList());
+  }
+
+  @Override
+  public Collection<String> getRepositoryNames() {
+    return Collections.unmodifiableSet(this.repositories.keySet());
   }
 
   @Override

@@ -8,8 +8,7 @@
     <version>10.2-SNAPSHOT</version>
   </parent>
   <artifactId>nuxeo-cmis-sync-core</artifactId>
-  <name>Nuxeo cmis sync core</name>
-  <description>CMIS Synchronization :: Core</description>
+  <name>Nuxeo CMIS Sync :: Core</name>
 
   <dependencies>
     <dependency>

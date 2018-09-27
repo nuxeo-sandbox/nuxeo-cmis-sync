@@ -14,6 +14,7 @@ import org.nuxeo.ecm.automation.core.annotations.Context;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
 import org.nuxeo.ecm.automation.core.annotations.OperationMethod;
 import org.nuxeo.ecm.automation.core.annotations.Param;
+import org.nuxeo.ecm.automation.core.collectors.DocumentModelCollector;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.model.Property;
@@ -38,9 +39,6 @@ public class CMISImport extends CMISOperations {
   @Param(name = "connection", required = false)
   protected String connection;
 
-  @Param(name = "path", required = true)
-  protected String localPath;
-
   @Param(name = "remoteRef", required = false)
   protected String remoteRef;
 
@@ -53,13 +51,13 @@ public class CMISImport extends CMISOperations {
   @Param(name = "state", required = false)
   protected String state;
 
-  @OperationMethod
-  public DocumentModel run() {
+  @OperationMethod(collector = DocumentModelCollector.class)
+  public DocumentModel run(DocumentModel target) {
 
     // Get document, check facet
     AtomicReference<String> remoteRef = new AtomicReference<>(this.remoteRef);
     AtomicBoolean idRef = new AtomicBoolean(this.idRef);
-    DocumentModel model = loadDocument(this.session, this.localPath, remoteRef, idRef);
+    DocumentModel model = loadDocument(this.session, target, remoteRef, idRef);
     if (!model.isFolder()) {
       throw new IllegalArgumentException("Cannot synchronize non-folderish documents");
     }

@@ -10,7 +10,6 @@ import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.sync.cmis.api.CMISRemoteService;
 
@@ -24,15 +23,15 @@ public abstract class CMISOperations {
     super();
   }
 
-  protected DocumentModel loadDocument(CoreSession session, String path, AtomicReference<String> remoteRef,
+  protected DocumentModel loadDocument(CoreSession session, DocumentModel target, AtomicReference<String> remoteRef,
       AtomicBoolean idRef) {
     if (session == null) {
       throw new NullPointerException("session");
     }
-    if (path == null) {
-      throw new NullPointerException("path");
+    if (target == null) {
+      throw new NullPointerException("document");
     }
-    DocumentModel model = session.getDocument(new PathRef(path));
+    DocumentModel model = target;
     if (!model.hasFacet("cmissync")) {
       model.addFacet("cmissync");
     }
@@ -105,10 +104,10 @@ public abstract class CMISOperations {
   protected boolean requiresUpdate(CmisObject remote, Property p, boolean force) {
     // Check Last Modified
     Property syncTime = p.get("synchronized");
-    Date syncRef = (Date) syncTime.getValue();
+    GregorianCalendar syncRef = (GregorianCalendar) syncTime.getValue();
     GregorianCalendar cal = remote.getLastModificationDate();
 
-    return force || syncRef == null || cal.getTime().after(syncRef);
+    return force || syncRef == null || cal.after(syncRef);
   }
 
   protected void updateSyncAttributes(CmisObject remote, Property p, String state) {

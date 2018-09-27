@@ -56,7 +56,6 @@ public class TestCMISImport {
 
   @Test
   public void shouldCallWithParameters() throws OperationException {
-    final String path = "/sync/folder";
     final String remote = "/default-domain/workspaces/Documents";
 
     OperationContext ctx = new OperationContext(session);
@@ -65,14 +64,9 @@ public class TestCMISImport {
     OperationChain chain = new OperationChain("folderChain");
     chain.add(FetchContextDocument.ID);
     chain.add(CreateDocument.ID).set("type", "Folder").set("name", "folder").set("properties", "dc:title=AFolder");
+    chain.add(CMISSync.ID).set("connection", "test").set("remoteRef", remote);
+    chain.add(CMISImport.ID).set("state", "imported");
     DocumentModel doc = (DocumentModel) service.run(ctx, chain);
-    session.save();
-    assertEquals(path, doc.getPathAsString());
-
-    chain = new OperationChain("importChain");
-    chain.add(CMISSync.ID).set("connection", "test").set("path", path).set("remoteRef", remote);
-    chain.add(CMISImport.ID).set("path", path).set("state", "imported");
-    doc = (DocumentModel) service.run(ctx, chain);
     session.save();
     assertEquals("test", doc.getPropertyValue("cmissync:sync/connection"));
 
