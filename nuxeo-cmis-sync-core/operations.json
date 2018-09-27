@@ -1,0 +1,153 @@
+{
+    "operations": [{
+            "id": "Document.CMISSync",
+            "label": "CMIS Document Synchronization",
+            "category": "Document",
+            "requires": null,
+            "description": "Synchronize CMIS content with a remote repository.",
+            "url": "Document.CMISSync",
+            "signature": [
+                "document",
+                "document",
+                "documents",
+                "documents"
+            ],
+            "params": [{
+                    "name": "connection",
+                    "description": "",
+                    "type": "string",
+                    "required": false,
+                    "widget": null,
+                    "order": 0,
+                    "values": []
+                },
+                {
+                    "name": "content",
+                    "description": "",
+                    "type": "boolean",
+                    "required": false,
+                    "widget": null,
+                    "order": 0,
+                    "values": [
+                        "true"
+                    ]
+                },
+                {
+                    "name": "contentXPath",
+                    "description": "",
+                    "type": "string",
+                    "required": false,
+                    "widget": null,
+                    "order": 0,
+                    "values": [
+                        "file:content"
+                    ]
+                },
+                {
+                    "name": "force",
+                    "description": "",
+                    "type": "boolean",
+                    "required": false,
+                    "widget": null,
+                    "order": 0,
+                    "values": [
+                        "false"
+                    ]
+                },
+                {
+                    "name": "idRef",
+                    "description": "",
+                    "type": "boolean",
+                    "required": false,
+                    "widget": null,
+                    "order": 0,
+                    "values": [
+                        "false"
+                    ]
+                },
+                {
+                    "name": "remoteRef",
+                    "description": "",
+                    "type": "string",
+                    "required": false,
+                    "widget": null,
+                    "order": 0,
+                    "values": []
+                },
+                {
+                    "name": "state",
+                    "description": "",
+                    "type": "string",
+                    "required": false,
+                    "widget": null,
+                    "order": 0,
+                    "values": []
+                }
+            ]
+        },
+        {
+            "id": "Repository.CMISImport",
+            "label": "CMIS Structure Import",
+            "category": "Fetch",
+            "requires": null,
+            "description": "Import CMIS content with a remote repository.",
+            "url": "Repository.CMISImport",
+            "signature": [
+                "document",
+                "document",
+                "documents",
+                "documents"
+            ],
+            "params": [{
+                    "name": "connection",
+                    "description": "",
+                    "type": "string",
+                    "required": false,
+                    "widget": null,
+                    "order": 0,
+                    "values": []
+                },
+                {
+                    "name": "force",
+                    "description": "",
+                    "type": "boolean",
+                    "required": false,
+                    "widget": null,
+                    "order": 0,
+                    "values": [
+                        "false"
+                    ]
+                },
+                {
+                    "name": "idRef",
+                    "description": "",
+                    "type": "boolean",
+                    "required": false,
+                    "widget": null,
+                    "order": 0,
+                    "values": [
+                        "false"
+                    ]
+                },
+                {
+                    "name": "remoteRef",
+                    "description": "",
+                    "type": "string",
+                    "required": false,
+                    "widget": null,
+                    "order": 0,
+                    "values": []
+                },
+                {
+                    "name": "state",
+                    "description": "",
+                    "type": "string",
+                    "required": false,
+                    "widget": null,
+                    "order": 0,
+                    "values": []
+                }
+            ]
+        }
+    ]
+}

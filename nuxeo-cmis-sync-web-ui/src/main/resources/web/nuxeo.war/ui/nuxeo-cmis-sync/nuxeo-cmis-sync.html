@@ -16,21 +16,21 @@ limitations under the License.
 <link rel="import" href="cmis-sync.html">
 <link rel="import" href="cmis-import.html">
 
-<nuxeo-slot-content name="cmis-import" slot="DOCUMENT_ACTIONS">
+<nuxeo-slot-content name="cmis-sync" slot="DOCUMENT_ACTIONS" order="15">
   <template>
-    <nuxeo-filter document="[[document]]" type="Folder" permission="Write" facet="cmissync">
+    <nuxeo-filter document="[[document]]" permission="Write">
       <template>
-        <cmis-import document="[[document]]" label="Import CMIS Content"></cmis-import>
+        <cmis-sync document="[[document]]" label="Synchronize CMIS Content"></cmis-sync>
       </template>
     </nuxeo-filter>
   </template>
 </nuxeo-slot-content>
 
-<nuxeo-slot-content name="cmis-sync" slot="DOCUMENT_ACTIONS">
+<nuxeo-slot-content name="cmis-import" slot="DOCUMENT_ACTIONS" order="16">
   <template>
-    <nuxeo-filter document="[[document]]" permission="Write">
+    <nuxeo-filter document="[[document]]" permission="Write" facet="Folderish,cmissync">
       <template>
-        <cmis-sync document="[[document]]" label="Synchronize CMIS Content"></cmis-sync>
+        <cmis-import document="[[document]]" label="Import CMIS Content"></cmis-import>
       </template>
     </nuxeo-filter>
   </template>

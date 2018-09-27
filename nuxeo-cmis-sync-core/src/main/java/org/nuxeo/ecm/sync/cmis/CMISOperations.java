@@ -71,7 +71,8 @@ public abstract class CMISOperations {
     if (syncRepo.getValue() == null) {
       syncRepo.setValue(repoId);
     } else if (!syncRepo.getValue().equals(repoId)) {
-      throw new IllegalArgumentException("Mis-matched remote repository identifier");
+      throw new IllegalArgumentException(
+          "Mis-matched remote repository identifier: " + syncRepo.getValue() + " != " + repoId);
     }
     return repo;
   }
@@ -105,7 +106,8 @@ public abstract class CMISOperations {
         p.get("paths").setValue(pathy.getPaths());
       }
     } else if (!model.getPropertyValue(REMOTE_UID).equals(remote.getId())) {
-      throw new IllegalArgumentException("Mis-matched remote document UUID");
+      throw new IllegalArgumentException(
+          "Mis-matched remote document UUID: " + model.getPropertyValue(REMOTE_UID) + " != " + remote.getId());
     }
   }
 

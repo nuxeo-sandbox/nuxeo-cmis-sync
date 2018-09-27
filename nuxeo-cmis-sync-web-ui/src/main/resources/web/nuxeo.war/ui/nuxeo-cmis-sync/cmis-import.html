@@ -47,7 +47,7 @@ Example:
       }
     </style>
 
-    <nuxeo-operation id="cmisImport" op="Repository.CMISImport" input="[[document.uid]]"></nuxeo-operation>
+    <nuxeo-operation id="cmisImport" op="Repository.CMISImport" input="[[document.uid]]" params="[[_params()]]"></nuxeo-operation>
 
     <template is="dom-if" if="[[_isAvailable(document)]]">
       <paper-icon-button icon="[[icon]]" on-click="_import" noink></paper-icon-button>
@@ -70,12 +70,21 @@ Example:
       },
 
       _isAvailable: function (document) {
-        return document;
+        return document && document.properties && document.properties["cmissync:uid"];
+      },
+
+      _params: function () {
+        return {
+          "state": "queued"
+        };
       },
 
       _import: function () {
         this.$.cmisImport.execute().then(() => {
           this.fire('document-updated');
+          this.fire('notify', {
+            message: "Children Imported"
+          });
         });
       }
 

@@ -76,6 +76,10 @@ Example:
           observer: "_documentChanged"
         },
 
+        uid: {
+          type:String
+        },
+
         icon: {
           type: String,
           value: 'icons:compare-arrows'
@@ -102,28 +106,38 @@ Example:
       },
 
       _documentChanged: function () {
+        if (this.document.uid !== this.uid) {
+          this.configured = "no";
+          this.connection = "";
+          this.remotePath = "";
+          this.uid = this.document.uid;
+        }
         if (this.configured == "no" && this.document && this.document.properties["cmissync:sync"]) {
           var val = this.document.properties["cmissync:sync"]["connection"];
           if (val) {
             this.connection = val;
           }
-          val = this.document.properties["cmissync:sync"]["paths"];
-          if (val && val.length > 0) {
-            this.remotePath = val[0];
+          val = this.document.properties["cmissync:uid"];
+          if (val && val != "") {
+            this.remotePath = val;
           } else {
-            this.remotePath = this.document.properties["cmissync:uid"];
+            val = this.document.properties["cmissync:sync"]["paths"];
+            if (val && val.length > 0) {
+              this.remotePath = val[0];
+            }
           }
           if (this.connection !== "" && this.remotePath !== "") {
             this.configured = "yes";
+            console.log("CMIS configured");
           }
-        } else {
-          console.log("no CMIS properties");
+        } else if (this.configured !== "yes") {
+          console.log("CMIS Configured? " + this.configured);
           return;
         }
       },
 
       _toggleDialog: function () {
-        if (this.configured) {
+        if (this.configured == "yes") {
           this._sync();
         } else {
           this.$.dialog.toggle();
@@ -144,13 +158,16 @@ Example:
         if (this.document) {
           console.log("Performing sync");
           this.$.cmisSync.execute().then(() => {
-            console.log("Fired event");
             this.fire('document-updated');
-          }).error(() => {
+            this.fire('notify', {
+              message: "Document Synchronized"
+            });
+          }).catch((error) => {
+            console.log(error);
             this.configured = "error";
             this.fire('notify', {
-              message: "Synchronization failed"
-            })
+              message: "Synchronization Failed: " + error
+            });
           });
         }
       }

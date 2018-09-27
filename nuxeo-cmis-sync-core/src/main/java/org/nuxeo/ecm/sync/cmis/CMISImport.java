@@ -116,8 +116,6 @@ public class CMISImport extends CMISOperations {
 
     try {
       DocumentModel child = this.session.createDocumentModel(model.getPathAsString(), obj.getName(), docType);
-      child = this.session.getOrCreateDocument(child);
-
       child.addFacet("cmissync");
       child.setPropertyValue("dc:title", obj.getName());
       child.setPropertyValue(REMOTE_UID, obj.getId());
@@ -130,7 +128,7 @@ public class CMISImport extends CMISOperations {
       child.setPropertyValue(SYNC_DATA + "/repository", p.getValue("repository"));
       child.setPropertyValue(SYNC_DATA + "/state", this.state);
 
-      child = this.session.saveDocument(child);
+      child = this.session.getOrCreateDocument(child);
     } catch (Exception ex) {
       log.error("Error creating document", ex);
       throw new RuntimeException(ex);
