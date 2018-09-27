@@ -8,6 +8,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.Session;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.model.Property;
@@ -18,6 +20,8 @@ public abstract class CMISOperations {
   public static final String REMOTE_UID = "cmissync:uid";
 
   public static final String SYNC_DATA = "cmissync:sync";
+
+  private static final Log log = LogFactory.getLog(CMISOperations.class);
 
   public CMISOperations() {
     super();
@@ -73,6 +77,10 @@ public abstract class CMISOperations {
   }
 
   protected CmisObject loadObject(Session repo, String remoteRef, boolean idRef) {
+    if (!remoteRef.startsWith("/") && !idRef) {
+      log.warn("Using ID reference for non-path like value: " + remoteRef);
+      idRef = true;
+    }
     CmisObject remote = null;
     if (idRef) {
       remote = repo.getObject(remoteRef);

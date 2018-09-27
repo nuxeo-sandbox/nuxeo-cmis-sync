@@ -1,23 +1,21 @@
 <?xml version="1.0"?>
 <component name="org.nuxeo.ecm.sync.cmis.testContrib.repository">
 
-  <extension target="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent" point="repository">
+  <require>org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent</require>
 
+  <extension target="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent" point="repository">
     <repository name="test" enabled="true" binding="browser">
       <repository>default</repository>
       <url>http://laptop:9090/nuxeo/json/cmis</url>
       <username>Administrator</username>
       <credentials>Administrator</credentials>
     </repository>
-
   </extension>
 
   <extension target="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent" point="mapping">
-
     <mapping name="Copy Description for Everything" xpath="dc:description" property="dc:description"/>
     <mapping name="Copy coverage for files" xpath="dc:coverage" property="dc:coverage" doctype="File"/>
     <mapping name="Update value for picture" xpath="c:c" property="prop_c" doctype="Picture"/>
-
   </extension>
 
 </component>

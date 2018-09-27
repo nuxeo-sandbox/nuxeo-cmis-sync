@@ -73,7 +73,7 @@ Example:
         return document;
       },
 
-      _sync: function () {
+      _import: function () {
         this.$.cmisImport.execute().then(() => {
           this.fire('document-updated');
         });

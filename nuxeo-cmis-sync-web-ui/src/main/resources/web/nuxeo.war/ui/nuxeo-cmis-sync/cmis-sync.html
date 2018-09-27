@@ -57,11 +57,11 @@ Example:
 
     <nuxeo-dialog id="dialog" with-backdrop>
       <h2>CMIS Settings</h2>
-      <paper-input id="connection" label="Connection" value="[[connection]]" autofocus></paper-input>
-      <paper-input id="remotePath" label="Remote Path" value="[[remotePath]]"></paper-input>
+      <paper-input id="connection" label="Connection" value="{{connection}}" autofocus></paper-input>
+      <paper-input id="remotePath" label="Remote Path" value="{{remotePath}}"></paper-input>
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button>
-        <paper-button dialog-confirm on-click="_sync">Synchronize</paper-button>
+        <paper-button class="primary" dialog-confirm on-click="_sync">Synchronize</paper-button>
       </div>
     </nuxeo-dialog>
   </template>
@@ -71,7 +71,10 @@ Example:
       behaviors: [Nuxeo.I18nBehavior, Nuxeo.FiltersBehavior],
       properties: {
 
-        document: Object,
+        document: {
+          type: Object,
+          observer: "_documentChanged"
+        },
 
         icon: {
           type: String,
@@ -80,12 +83,17 @@ Example:
 
         connection: {
           type: String,
-          value: "default"
+          value: ""
         },
 
         remotePath: {
           type: String,
           value: ""
+        },
+
+        configured: {
+          type: String,
+          value: "no"
         }
       },
 
@@ -93,22 +101,58 @@ Example:
         return document;
       },
 
+      _documentChanged: function () {
+        if (this.configured == "no" && this.document && this.document.properties["cmissync:sync"]) {
+          var val = this.document.properties["cmissync:sync"]["connection"];
+          if (val) {
+            this.connection = val;
+          }
+          val = this.document.properties["cmissync:sync"]["paths"];
+          if (val && val.length > 0) {
+            this.remotePath = val[0];
+          } else {
+            this.remotePath = this.document.properties["cmissync:uid"];
+          }
+          if (this.connection !== "" && this.remotePath !== "") {
+            this.configured = "yes";
+          }
+        } else {
+          console.log("no CMIS properties");
+          return;
+        }
+      },
+
       _toggleDialog: function () {
-        this.$.dialog.toggle();
-        this.$.connection.inputElement.inputElement.select();
+        if (this.configured) {
+          this._sync();
+        } else {
+          this.$.dialog.toggle();
+          this.$.connection.inputElement.inputElement.select();
+        }
       },
 
       _params: function (connection, remotePath) {
+        var idRef = remotePath.startsWith("/") == false;
         return {
-          "connection": connection,
-          "remoteRef": remotePath
+          "connection": this.connection,
+          "remoteRef": this.remotePath,
+          "idRef": idRef,
         };
       },
 
       _sync: function () {
-        this.$.cmisSync.execute().then(() => {
-          this.fire('document-updated');
-        });
+        if (this.document) {
+          console.log("Performing sync");
+          this.$.cmisSync.execute().then(() => {
+            console.log("Fired event");
+            this.fire('document-updated');
+          }).error(() => {
+            this.configured = "error";
+            this.fire('notify', {
+              message: "Synchronization failed"
+            })
+          });
+        }
       }
 
     });

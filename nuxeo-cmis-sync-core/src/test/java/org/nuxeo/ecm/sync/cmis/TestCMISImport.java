@@ -31,7 +31,7 @@ import org.nuxeo.runtime.test.runner.FeaturesRunner;
 @Features(AutomationFeature.class)
 @RepositoryConfig(init = DefaultRepositoryInit.class, cleanup = Granularity.METHOD)
 @Deploy({ "org.nuxeo.ecm.sync.cmis", "org.nuxeo.ecm.sync.cmis:OSGI-INF/cmis-repository-test-contribs.xml" })
-@Ignore
+//@Ignore
 public class TestCMISImport {
 
   private static final Log log = LogFactory.getLog(TestCMISImport.class);
