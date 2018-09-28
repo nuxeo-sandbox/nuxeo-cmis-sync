@@ -38,14 +38,14 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
 
   @Override
   public void activate(ComponentContext context) {
-    this.mappings = new HashMap<>();
-    this.repositories = new HashMap<>();
+    mappings = new HashMap<>();
+    repositories = new HashMap<>();
   }
 
   @Override
   public void deactivate(ComponentContext context) {
-    this.mappings = null;
-    this.repositories = null;
+    mappings = null;
+    repositories = null;
   }
 
   @Override
@@ -72,17 +72,17 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
 
   @Override
   public List<CMISMappingDescriptor> getMappings(String doctype) {
-    return this.mappings.values().stream().filter(m -> m.matches(doctype)).collect(Collectors.toList());
+    return mappings.values().stream().filter(m -> m.matches(doctype)).collect(Collectors.toList());
   }
 
   @Override
   public Collection<String> getRepositoryNames() {
-    return Collections.unmodifiableSet(this.repositories.keySet());
+    return Collections.unmodifiableSet(repositories.keySet());
   }
 
   @Override
   public Session createSession(String repository) {
-    CMISRepositoryDescriptor desc = this.repositories.get(repository);
+    CMISRepositoryDescriptor desc = repositories.get(repository);
     if (desc == null) {
       throw new IllegalArgumentException("No such repository: " + repository);
     }
@@ -110,6 +110,11 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
     }
 
     return sessionFactory.createSession(parameter);
+  }
+
+  @Override
+  public CMISRepositoryDescriptor getRepositoryDescriptor(String repository) {
+      return repositories.get(repository);
   }
 
 }

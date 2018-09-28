@@ -24,9 +24,10 @@ import static org.junit.Assert.assertNotNull;
 import javax.inject.Inject;
 
 import org.apache.chemistry.opencmis.client.api.Session;
-import org.junit.Ignore;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.nuxeo.ecm.sync.cmis.TestHelper;
 import org.nuxeo.ecm.sync.cmis.api.CMISRemoteService;
 import org.nuxeo.runtime.test.runner.Deploy;
 import org.nuxeo.runtime.test.runner.Features;
@@ -41,24 +42,27 @@ import org.nuxeo.runtime.test.runner.RuntimeFeature;
 @RunWith(FeaturesRunner.class)
 @Features(RuntimeFeature.class)
 @Deploy({ "org.nuxeo.ecm.sync.cmis", "org.nuxeo.ecm.sync.cmis:OSGI-INF/cmis-repository-test-contribs.xml" })
-@Ignore
+// @Ignore
 public class TestService {
 
-  @Inject
-  protected CMISRemoteService cmis;
+    @Inject
+    protected CMISRemoteService cmis;
 
-  @Test
-  public void testRepositoryConnection() throws Exception {
-    Session ses = cmis.createSession("test");
-    assertNotNull(ses);
-    assertEquals("default", ses.getRepositoryInfo().getId());
-  }
-  
-  public void testRepositoryMapping() throws Exception {
-    assertEquals(1, cmis.getMappings(null).size());
-    assertEquals(1, cmis.getMappings("Document").size());
-    assertEquals(2, cmis.getMappings("Folder").size());
-    assertEquals(2, cmis.getMappings("Picture").size());
-  }
+    @Test
+    public void testRepositoryConnection() throws Exception {
+
+        Assume.assumeTrue("No distant CMIS server can be reached", TestHelper.isTestCMISServerRunning(cmis));
+
+        Session ses = cmis.createSession("test");
+        assertNotNull(ses);
+        assertEquals("default", ses.getRepositoryInfo().getId());
+    }
+
+    public void testRepositoryMapping() throws Exception {
+        assertEquals(1, cmis.getMappings(null).size());
+        assertEquals(1, cmis.getMappings("Document").size());
+        assertEquals(2, cmis.getMappings("Folder").size());
+        assertEquals(2, cmis.getMappings("Picture").size());
+    }
 
 }
