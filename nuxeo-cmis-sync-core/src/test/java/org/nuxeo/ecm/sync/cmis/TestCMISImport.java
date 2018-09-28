@@ -7,7 +7,6 @@ import javax.inject.Inject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nuxeo.ecm.automation.AutomationService;
@@ -20,6 +19,8 @@ import org.nuxeo.ecm.automation.test.AutomationFeature;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.event.EventService;
+import org.nuxeo.ecm.core.event.EventServiceAdmin;
 import org.nuxeo.ecm.core.test.DefaultRepositoryInit;
 import org.nuxeo.ecm.core.test.annotations.Granularity;
 import org.nuxeo.ecm.core.test.annotations.RepositoryConfig;
@@ -31,7 +32,7 @@ import org.nuxeo.runtime.test.runner.FeaturesRunner;
 @Features(AutomationFeature.class)
 @RepositoryConfig(init = DefaultRepositoryInit.class, cleanup = Granularity.METHOD)
 @Deploy({ "org.nuxeo.ecm.sync.cmis", "org.nuxeo.ecm.sync.cmis:OSGI-INF/cmis-repository-test-contribs.xml" })
-//@Ignore
+// @Ignore
 public class TestCMISImport {
 
   private static final Log log = LogFactory.getLog(TestCMISImport.class);
@@ -41,6 +42,12 @@ public class TestCMISImport {
 
   @Inject
   protected AutomationService service;
+
+  @Inject
+  protected EventService eventService;
+
+  @Inject
+  protected EventServiceAdmin eventServiceAdmin;
 
   protected DocumentModel src;
 
@@ -82,6 +89,16 @@ public class TestCMISImport {
     }
     service.run(ctx, chain);
     session.save();
+
+    eventService.waitForAsyncCompletion();
+    while (eventServiceAdmin.getEventsInQueueCount() > 0) {
+      eventService.waitForAsyncCompletion();
+      Thread.yield();
+      try {
+        Thread.sleep(100);
+      } catch (InterruptedException e) {
+      }
+    }
 
     dml = session.getChildren(doc.getRef());
     assertEquals(4, dml.size());

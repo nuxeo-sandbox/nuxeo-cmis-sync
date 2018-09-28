@@ -28,7 +28,7 @@ limitations under the License.
 
 <nuxeo-slot-content name="cmis-import" slot="DOCUMENT_ACTIONS" order="16">
   <template>
-    <nuxeo-filter document="[[document]]" permission="Write" facet="Folderish,cmissync">
+    <nuxeo-filter document="[[document]]" permission="Write" facet="Folderish">
       <template>
         <cmis-import document="[[document]]" label="Import CMIS Content"></cmis-import>
       </template>
