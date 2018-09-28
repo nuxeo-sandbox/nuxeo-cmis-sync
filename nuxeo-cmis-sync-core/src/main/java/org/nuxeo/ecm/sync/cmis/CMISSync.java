@@ -32,89 +32,89 @@ import org.nuxeo.ecm.sync.cmis.service.CMISMappingDescriptor;
 @Operation(id = CMISSync.ID, category = Constants.CAT_DOCUMENT, label = "CMIS Document Synchronization", description = "Synchronize CMIS content with a remote repository.")
 public class CMISSync extends CMISOperations {
 
-  public static final String ID = "Document.CMISSync";
+    public static final String ID = "Document.CMISSync";
 
-  private static final Log log = LogFactory.getLog(CMISSync.class);
+    private static final Log log = LogFactory.getLog(CMISSync.class);
 
-  @Context
-  protected CoreSession session;
+    @Context
+    protected CoreSession session;
 
-  @Context
-  protected CMISRemoteService cmis;
+    @Context
+    protected CMISRemoteService cmis;
 
-  @Param(name = "connection", required = false)
-  protected String connection;
+    @Param(name = "connection", required = false)
+    protected String connection;
 
-  @Param(name = "remoteRef", required = false)
-  protected String remoteRef;
+    @Param(name = "remoteRef", required = false)
+    protected String remoteRef;
 
-  @Param(name = "idRef", required = false, values = "false")
-  protected boolean idRef = false;
+    @Param(name = "idRef", required = false, values = "false")
+    protected boolean idRef = false;
 
-  @Param(name = "force", required = false, values = "false")
-  protected boolean force = false;
+    @Param(name = "force", required = false, values = "false")
+    protected boolean force = false;
 
-  @Param(name = "state", required = false)
-  protected String state;
+    @Param(name = "state", required = false)
+    protected String state;
 
-  @Param(name = "content", required = false, values = "true")
-  protected boolean content = true;
+    @Param(name = "content", required = false, values = "true")
+    protected boolean content = true;
 
-  @Param(name = "contentXPath", required = false, values = "file:content")
-  protected String contentXPath = "file:content";
+    @Param(name = "contentXPath", required = false, values = "file:content")
+    protected String contentXPath = "file:content";
 
-  @OperationMethod(collector = DocumentModelCollector.class)
-  public DocumentModel run(DocumentModel target) {
+    @OperationMethod(collector = DocumentModelCollector.class)
+    public DocumentModel run(DocumentModel target) {
 
-    // Get document, check facet
-    AtomicReference<String> remoteRef = new AtomicReference<>(this.remoteRef);
-    AtomicBoolean idRef = new AtomicBoolean(this.idRef);
-    DocumentModel model = loadDocument(this.session, target, remoteRef, idRef);
+        // Get document, check facet
+        AtomicReference<String> remoteRef = new AtomicReference<>(this.remoteRef);
+        AtomicBoolean idRef = new AtomicBoolean(this.idRef);
+        DocumentModel model = loadDocument(this.session, target, remoteRef, idRef);
 
-    // Validate repository
-    Property p = model.getProperty(SYNC_DATA);
-    this.connection = validateConnection(p, this.connection);
+        // Validate repository
+        Property p = model.getProperty(SYNC_DATA);
+        this.connection = validateConnection(p, this.connection);
 
-    // Obtain Session from CMIS component
-    Session repo = createSession(p, this.cmis);
+        // Obtain Session from CMIS component
+        Session repo = createSession(p, this.cmis);
 
-    // Retrieve object
-    CmisObject remote = loadObject(repo, remoteRef.get(), idRef.get());
-    checkObject(remote, model, p);
+        // Retrieve object
+        CmisObject remote = loadObject(repo, remoteRef.get(), idRef.get());
+        checkObject(remote, model, p);
 
-    // Update document
-    if (requiresUpdate(remote, p, this.force)) {
-      List<CMISMappingDescriptor> descs = this.cmis.getMappings(model.getDocumentType().getName());
-      for (CMISMappingDescriptor desc : descs) {
-        Object val = remote.getPropertyValue(desc.getProperty());
-        Property dp = model.getProperty(desc.getXpath());
-        if (val != null) {
-          dp.setValue(val);
-        } else {
-          dp.remove();
+        // Update document
+        if (requiresUpdate(remote, p, this.force)) {
+            List<CMISMappingDescriptor> descs = this.cmis.getMappings(model.getDocumentType().getName());
+            for (CMISMappingDescriptor desc : descs) {
+                Object val = remote.getPropertyValue(desc.getProperty());
+                Property dp = model.getProperty(desc.getXpath());
+                if (val != null) {
+                    dp.setValue(val);
+                } else {
+                    dp.remove();
+                }
+            }
+
+            if (this.content && remote instanceof Document) {
+                try {
+                    Document rdoc = (Document) remote;
+                    ContentStream rstream = rdoc.getContentStream();
+                    Blob blb = Blobs.createBlob(rstream.getStream());
+                    blb.setFilename(rstream.getFileName());
+                    blb.setMimeType(rstream.getMimeType());
+                    DocumentHelper.addBlob(model.getProperty(this.contentXPath), blb);
+                    model.setPropertyValue(SYNC_DATA + "/uri", rdoc.getContentUrl());
+                } catch (IOException iox) {
+                    log.warn("Unable to copy remote content", iox);
+                }
+            }
         }
-      }
 
-      if (this.content && remote instanceof Document) {
-        try {
-          Document rdoc = (Document) remote;
-          ContentStream rstream = rdoc.getContentStream();
-          Blob blb = Blobs.createBlob(rstream.getStream());
-          blb.setFilename(rstream.getFileName());
-          blb.setMimeType(rstream.getMimeType());
-          DocumentHelper.addBlob(model.getProperty(this.contentXPath), blb);
-          model.setPropertyValue(SYNC_DATA + "/uri", rdoc.getContentUrl());
-        } catch (IOException iox) {
-          log.warn("Unable to copy remote content", iox);
-        }
-      }
+        // Set sync attributes
+        updateSyncAttributes(remote, p, this.state);
+
+        // Save and return
+        model = session.saveDocument(model);
+        return model;
     }
-
-    // Set sync attributes
-    updateSyncAttributes(remote, p, this.state);
-
-    // Save and return
-    model = session.saveDocument(model);
-    return model;
-  }
 }

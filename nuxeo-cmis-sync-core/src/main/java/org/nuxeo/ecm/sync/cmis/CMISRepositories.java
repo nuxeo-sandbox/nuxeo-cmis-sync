@@ -18,17 +18,17 @@ import com.fasterxml.jackson.core.JsonGenerator;
 @Setup(mode = Instantiations.SINGLETON, priority = Priorities.REFERENCE)
 public class CMISRepositories extends AbstractJsonEnricher<DocumentModel> {
 
-  public static final String NAME = "cmisRepos";
+    public static final String NAME = "cmisRepos";
 
-  public CMISRepositories() {
-    super(NAME);
-  }
+    public CMISRepositories() {
+        super(NAME);
+    }
 
-  @Override
-  public void write(JsonGenerator jg, DocumentModel doc) throws IOException {
-    CMISRemoteService cmis = Framework.getService(CMISRemoteService.class);
-    jg.writeFieldName(NAME);
-    jg.writeObject(cmis.getRepositoryNames());
-  }
+    @Override
+    public void write(JsonGenerator jg, DocumentModel doc) throws IOException {
+        CMISRemoteService cmis = Framework.getService(CMISRemoteService.class);
+        jg.writeFieldName(NAME);
+        jg.writeObject(cmis.getRepositoryNames());
+    }
 
 }

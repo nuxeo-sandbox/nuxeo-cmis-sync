@@ -9,12 +9,12 @@ import org.nuxeo.ecm.sync.cmis.service.CMISRepositoryDescriptor;
 
 public interface CMISRemoteService {
 
-  Session createSession(String name);
+    Session createSession(String name);
 
-  List<CMISMappingDescriptor> getMappings(String doctype);
+    List<CMISMappingDescriptor> getMappings(String doctype);
 
-  Collection<String> getRepositoryNames();
+    Collection<String> getRepositoryNames();
 
-  CMISRepositoryDescriptor getRepositoryDescriptor(String repository);
+    CMISRepositoryDescriptor getRepositoryDescriptor(String repository);
 
 }

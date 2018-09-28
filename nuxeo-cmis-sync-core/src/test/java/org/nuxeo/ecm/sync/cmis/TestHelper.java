@@ -26,7 +26,6 @@ import org.nuxeo.ecm.sync.cmis.api.CMISRemoteService;
 import org.nuxeo.ecm.sync.cmis.service.CMISRepositoryDescriptor;
 
 /**
- *
  * @since 10.2
  */
 public class TestHelper {
@@ -42,7 +41,7 @@ public class TestHelper {
                 HttpURLConnection huc = (HttpURLConnection) url.openConnection();
                 huc.setRequestMethod("HEAD");
                 // Should receive 401 (unauthenticated), but any code is ok, means the server is responding
-                /*int ignore =*/ huc.getResponseCode();
+                /* int ignore = */ huc.getResponseCode();
 
                 return true;
             } catch (UnknownHostException e) {

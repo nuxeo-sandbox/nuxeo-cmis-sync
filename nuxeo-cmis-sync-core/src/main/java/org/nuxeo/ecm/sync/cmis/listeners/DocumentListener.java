@@ -15,57 +15,57 @@ import org.nuxeo.runtime.api.Framework;
 
 public class DocumentListener implements EventListener, PostCommitEventListener {
 
-  static final Log log = LogFactory.getLog(DocumentListener.class);
+    static final Log log = LogFactory.getLog(DocumentListener.class);
 
-  protected AutomationService service;
+    protected AutomationService service;
 
-  protected CMISRemoteService cmis;
+    protected CMISRemoteService cmis;
 
-  public DocumentListener() {
-    super();
-  }
-
-  private void checkServices() {
-    if (this.service == null) {
-      this.service = Framework.getService(AutomationService.class);
-      this.cmis = Framework.getService(CMISRemoteService.class);
+    public DocumentListener() {
+        super();
     }
-  }
 
-  @Override
-  public void handleEvent(EventBundle events) {
-    checkServices();
-    for (Event evt : events) {
-      if (evt.getContext() instanceof DocumentEventContext) {
-        DocumentEventContext context = (DocumentEventContext) evt.getContext();
-        if (filterDoc(context.getSourceDocument())) {
-          execute(context);
+    private void checkServices() {
+        if (this.service == null) {
+            this.service = Framework.getService(AutomationService.class);
+            this.cmis = Framework.getService(CMISRemoteService.class);
         }
-      }
     }
-  }
 
-  @Override
-  public void handleEvent(Event evt) {
-    checkServices();
-    if (evt.getContext() instanceof DocumentEventContext) {
-      DocumentEventContext context = (DocumentEventContext) evt.getContext();
-      if (filterDoc(context.getSourceDocument())) {
-        execute(context);
-      }
+    @Override
+    public void handleEvent(EventBundle events) {
+        checkServices();
+        for (Event evt : events) {
+            if (evt.getContext() instanceof DocumentEventContext) {
+                DocumentEventContext context = (DocumentEventContext) evt.getContext();
+                if (filterDoc(context.getSourceDocument())) {
+                    execute(context);
+                }
+            }
+        }
     }
-  }
 
-  private boolean filterDoc(DocumentModel model) {
-    return model != null && model.hasFacet("cmissync") && model.getPropertyValue("cmissync:uid") != null
-        && model.getPropertyValue("cmissync:sync/state") != null
-        && model.getPropertyValue("cmissync:sync/state").equals("queued");
-  }
+    @Override
+    public void handleEvent(Event evt) {
+        checkServices();
+        if (evt.getContext() instanceof DocumentEventContext) {
+            DocumentEventContext context = (DocumentEventContext) evt.getContext();
+            if (filterDoc(context.getSourceDocument())) {
+                execute(context);
+            }
+        }
+    }
 
-  private void execute(DocumentEventContext context) {
-    CMISSyncService sync = new CMISSyncService(context.getCoreSession(), this.cmis);
-    sync.setState("sync");
-    sync.run(context.getSourceDocument());
-  }
+    private boolean filterDoc(DocumentModel model) {
+        return model != null && model.hasFacet("cmissync") && model.getPropertyValue("cmissync:uid") != null
+                && model.getPropertyValue("cmissync:sync/state") != null
+                && model.getPropertyValue("cmissync:sync/state").equals("queued");
+    }
+
+    private void execute(DocumentEventContext context) {
+        CMISSyncService sync = new CMISSyncService(context.getCoreSession(), this.cmis);
+        sync.setState("sync");
+        sync.run(context.getSourceDocument());
+    }
 
 }
