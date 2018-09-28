@@ -18,4 +18,10 @@
     <mapping name="Update value for picture" xpath="c:c" property="prop_c" doctype="Picture"/>
   </extension>
 
+  <extension target="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent" point="ace-mapping">
+    <mapping remoteACE="cmis:read" localACE="Read"/>
+    <mapping remoteACE="cmis:write" localACE="readWrite"/>
+    <mapping remoteACE="cmis:everything" localACE="Everything"/>
+  </extension>
+
 </component>

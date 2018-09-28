@@ -29,7 +29,11 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
 
     public static final String EP_MAPPING = "mapping";
 
+    public static final String EP_ACE_MAPPING = "acxe-mapping";
+
     protected Map<String, CMISMappingDescriptor> mappings = null;
+
+    protected Map<String, String> aceMappings = null;
 
     protected Map<String, CMISRepositoryDescriptor> repositories = null;
 
@@ -40,12 +44,14 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
     @Override
     public void activate(ComponentContext context) {
         mappings = new HashMap<>();
+        aceMappings = new HashMap<>();
         repositories = new HashMap<>();
     }
 
     @Override
     public void deactivate(ComponentContext context) {
         mappings = null;
+        aceMappings = null;
         repositories = null;
     }
 
@@ -55,6 +61,9 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
             CMISMappingDescriptor desc = (CMISMappingDescriptor) contribution;
             String name = desc.getName();
             mappings.put(name, desc);
+        } else if (EP_ACE_MAPPING.equals(extensionPoint)) {
+            CMISAceMappingDescriptor desc = (CMISAceMappingDescriptor) contribution;
+            aceMappings.put(desc.getRemoteACE(), desc.getLocalACE());
         } else if (EP_REPO.equals(extensionPoint)) {
             CMISRepositoryDescriptor desc = (CMISRepositoryDescriptor) contribution;
             String name = desc.getName();
@@ -74,6 +83,11 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
     @Override
     public List<CMISMappingDescriptor> getMappings(String doctype) {
         return mappings.values().stream().filter(m -> m.matches(doctype)).collect(Collectors.toList());
+    }
+
+    @Override
+    public Map<String, String> getAceMappings() {
+        return Collections.unmodifiableMap(aceMappings);
     }
 
     @Override

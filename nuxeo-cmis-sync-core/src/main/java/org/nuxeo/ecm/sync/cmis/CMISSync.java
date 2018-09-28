@@ -1,13 +1,16 @@
 package org.nuxeo.ecm.sync.cmis;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Session;
+import org.apache.chemistry.opencmis.commons.data.Ace;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,6 +26,7 @@ import org.nuxeo.ecm.core.api.Blobs;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.model.Property;
+import org.nuxeo.ecm.core.api.security.ACL;
 import org.nuxeo.ecm.sync.cmis.api.CMISRemoteService;
 import org.nuxeo.ecm.sync.cmis.service.CMISMappingDescriptor;
 
@@ -69,22 +73,23 @@ public class CMISSync extends CMISOperations {
         // Get document, check facet
         AtomicReference<String> remoteRef = new AtomicReference<>(this.remoteRef);
         AtomicBoolean idRef = new AtomicBoolean(this.idRef);
-        DocumentModel model = loadDocument(this.session, target, remoteRef, idRef);
+        DocumentModel model = loadDocument(session, target, remoteRef, idRef);
 
         // Validate repository
         Property p = model.getProperty(SYNC_DATA);
-        this.connection = validateConnection(p, this.connection);
+        connection = validateConnection(p, connection);
 
         // Obtain Session from CMIS component
-        Session repo = createSession(p, this.cmis);
+        Session repo = createSession(p, cmis);
 
         // Retrieve object
         CmisObject remote = loadObject(repo, remoteRef.get(), idRef.get());
         checkObject(remote, model, p);
 
         // Update document
-        if (requiresUpdate(remote, p, this.force)) {
-            List<CMISMappingDescriptor> descs = this.cmis.getMappings(model.getDocumentType().getName());
+        if (requiresUpdate(remote, p, force)) {
+            // Update fields
+            List<CMISMappingDescriptor> descs = cmis.getMappings(model.getDocumentType().getName());
             for (CMISMappingDescriptor desc : descs) {
                 Object val = remote.getPropertyValue(desc.getProperty());
                 Property dp = model.getProperty(desc.getXpath());
@@ -95,23 +100,35 @@ public class CMISSync extends CMISOperations {
                 }
             }
 
-            if (this.content && remote instanceof Document) {
+            if (content && remote instanceof Document) {
                 try {
                     Document rdoc = (Document) remote;
                     ContentStream rstream = rdoc.getContentStream();
                     Blob blb = Blobs.createBlob(rstream.getStream());
                     blb.setFilename(rstream.getFileName());
                     blb.setMimeType(rstream.getMimeType());
-                    DocumentHelper.addBlob(model.getProperty(this.contentXPath), blb);
+                    DocumentHelper.addBlob(model.getProperty(contentXPath), blb);
                     model.setPropertyValue(SYNC_DATA + "/uri", rdoc.getContentUrl());
                 } catch (IOException iox) {
                     log.warn("Unable to copy remote content", iox);
                 }
             }
+
+            // Update ACL
+            List<Ace> remoteACEs = remote.getAcl() == null ? null : remote.getAcl().getAces();
+            if (remoteACEs != null) {
+                Map<String, String> aceMapping = cmis.getAceMappings();
+                Collection<String> localAceToSet = aceMapping.values();
+                // Remove current permissions that are not set in the distant repo
+                // (except the admin. ones)
+                ACL[] acl = model.getACP().getACLs();
+                // . . .to be continued. . .
+            }
+
         }
 
         // Set sync attributes
-        updateSyncAttributes(remote, p, this.state);
+        updateSyncAttributes(remote, p, state);
 
         // Save and return
         model = session.saveDocument(model);

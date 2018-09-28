@@ -20,6 +20,16 @@
     <object class="org.nuxeo.ecm.sync.cmis.service.CMISMappingDescriptor" />
   </extension-point>
 
+  <extension-point name="ace-mapping">
+    <documentation>
+      example:
+      <code>
+        <mapping remoteACE="cmis:write" localACE="ReadWrite"/>
+      </code>
+    </documentation>
+    <object class="org.nuxeo.ecm.sync.cmis.service.CMISAceMappingDescriptor" />
+  </extension-point>
+
   <extension-point name="repository">
     <documentation>
       example:
