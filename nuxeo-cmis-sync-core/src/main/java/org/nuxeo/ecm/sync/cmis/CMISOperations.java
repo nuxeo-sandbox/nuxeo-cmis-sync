@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.Session;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.CoreSession;
@@ -82,17 +83,22 @@ public abstract class CMISOperations {
       log.warn("Using ID reference for non-path like value: " + remoteRef);
       idRef = true;
     }
+
     CmisObject remote = null;
+    try {
     if (idRef) {
       remote = repo.getObject(remoteRef);
     } else {
       remote = repo.getObjectByPath(remoteRef);
     }
+    } catch(CmisObjectNotFoundException e) {
+        // Nothing, remote stays null
+    }
 
-    // Should be caught by getObject method, double-check
     if (remote == null) {
       throw new IllegalArgumentException("Remote reference not found");
     }
+
     return remote;
   }
 
