@@ -6,23 +6,24 @@
   <extension target="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent" point="repository">
     <repository name="test" enabled="true" binding="browser">
       <repository>default</repository>
-      <url>http://laptop:9090/nuxeo/json/cmis</url>
+      <url>http://localhost:8080/nuxeo/json/cmis</url>
       <username>Administrator</username>
       <credentials>Administrator</credentials>
+
+      <ace-mapping>
+        <remoteAce value="cmis:read">Read</remoteAce>
+        <remoteAce value="cmis:write">ReadWrite</remoteAce>
+        <remoteAce value="cmis:all">Everything</remoteAce>
+        <remoteAce value="Everything">Everything</remoteAce>
+      </ace-mapping>
+
     </repository>
   </extension>
 
   <extension target="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent" point="mapping">
-    <mapping name="Copy Description for Everything" xpath="dc:description" property="dc:description"/>
-    <mapping name="Copy coverage for files" xpath="dc:coverage" property="dc:coverage" doctype="File"/>
-    <mapping name="Update value for picture" xpath="c:c" property="prop_c" doctype="Picture"/>
-  </extension>
-
-  <extension target="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent" point="ace-mapping">
-    <ace-mapping remoteACE="cmis:read" localACE="Read"/>
-    <ace-mapping remoteACE="cmis:write" localACE="ReadWrite"/>
-    <ace-mapping remoteACE="cmis:all" localACE="Everything"/>
-    <ace-mapping remoteACE="Everything" localACE="Everything"/>
+    <mapping name="Copy Description for Everything" xpath="dc:description" property="dc:description" />
+    <mapping name="Copy coverage for files" xpath="dc:coverage" property="dc:coverage" doctype="File" />
+    <mapping name="Update value for picture" xpath="c:c" property="prop_c" doctype="Picture" />
   </extension>
 
 </component>

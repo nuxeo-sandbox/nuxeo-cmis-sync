@@ -37,6 +37,9 @@ public class CMISRepositoryDescriptor implements Serializable {
     @XNodeMap(value = "property", key = "@key", type = HashMap.class, componentType = String.class)
     protected Map<String, String> properties = new HashMap<>();
 
+    @XNodeMap(value = "ace-mapping/remoteAce", key = "@value", type = HashMap.class, componentType = String.class)
+    protected Map<String, String> aceMapping = new HashMap<>();
+
     public CMISRepositoryDescriptor() {
         super();
     }
@@ -103,6 +106,14 @@ public class CMISRepositoryDescriptor implements Serializable {
 
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
+    }
+
+    public Map<String, String> getAceMapping() {
+        return aceMapping;
+    }
+
+    public void setAceMapping(Map<String, String> aceMapping) {
+        this.aceMapping = aceMapping;
     }
 
 }

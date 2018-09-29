@@ -29,8 +29,6 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
 
     public static final String EP_MAPPING = "mapping";
 
-    public static final String EP_ACE_MAPPING = "ace-mapping";
-
     protected Map<String, CMISMappingDescriptor> mappings = null;
 
     protected Map<String, String> aceMapping = null;
@@ -62,9 +60,6 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
             CMISMappingDescriptor desc = (CMISMappingDescriptor) contribution;
             String name = desc.getName();
             mappings.put(name, desc);
-        } else if (EP_ACE_MAPPING.equals(extensionPoint)) {
-            CMISAceMappingDescriptor desc = (CMISAceMappingDescriptor) contribution;
-            aceMapping.put(desc.getRemoteACE(), desc.getLocalACE());
         } else if (EP_REPO.equals(extensionPoint)) {
             CMISRepositoryDescriptor desc = (CMISRepositoryDescriptor) contribution;
             String name = desc.getName();
@@ -77,6 +72,9 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
                 return;
             }
 
+            Map<String, String> loadedAceMapping = desc.getAceMapping();
+            aceMapping = Collections.unmodifiableMap(loadedAceMapping);
+
             repositories.put(name, desc);
         }
     }
@@ -88,7 +86,7 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
 
     @Override
     public Map<String, String> getAceMappings() {
-        return Collections.unmodifiableMap(aceMapping);
+        return aceMapping;
     }
 
     @Override

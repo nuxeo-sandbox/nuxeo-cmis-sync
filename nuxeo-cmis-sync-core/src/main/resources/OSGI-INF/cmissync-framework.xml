@@ -14,34 +14,28 @@
     <documentation>
       example:
       <code>
-        <mapping name="" xpath="" property="" doctype=""/>
+        <mapping name="" xpath="" property="" doctype="" />
       </code>
     </documentation>
     <object class="org.nuxeo.ecm.sync.cmis.service.CMISMappingDescriptor" />
-  </extension-point>
-
-  <extension-point name="ace-mapping">
-    <documentation>
-      example:
-      <code>
-        <ace-mapping remoteACE="cmis:read" localACE="Read"/>
-        <ace-mapping remoteACE="cmis:write" localACE="ReadWrite"/>
-        <ace-mapping remoteACE="CustomWrite" localACE="ReadWrite"/>
-      </code>
-    </documentation>
-    <object class="org.nuxeo.ecm.sync.cmis.service.CMISAceMappingDescriptor" />
   </extension-point>
 
   <extension-point name="repository">
     <documentation>
       example:
       <code>
-        <repository name="" enabled="true" binding="">
-          <repository></repository>
-          <url></url>
-          <username></username>
-          <credentials></credentials>
+        <repository name="remoteNuxeo" enabled="true" binding="repository">
+          <repository>default</repository>
+          <url>http://some.server.com/nuxeo/json/cmis</url>
+          <username>Administrator</username>
+          <credentials>123</credentials>
           <property key=""></property>
+          <!-- Example of a list of ACE mapping -->
+          <ace-mapping>
+            <remoteAce value="permToRead">Read</remoteAce>
+            <remoteAce value="permToWrite">ReadWrite</remoteAce>
+            <remoteAce value="permFprAll">Everything</remoteAce>
+          </ace-mapping>
         </repository>
       </code>
     </documentation>
