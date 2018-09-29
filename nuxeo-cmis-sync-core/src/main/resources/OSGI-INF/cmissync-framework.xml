@@ -24,7 +24,9 @@
     <documentation>
       example:
       <code>
-        <mapping remoteACE="cmis:write" localACE="ReadWrite"/>
+        <ace-mapping remoteACE="cmis:read" localACE="Read"/>
+        <ace-mapping remoteACE="cmis:write" localACE="ReadWrite"/>
+        <ace-mapping remoteACE="CustomWrite" localACE="ReadWrite"/>
       </code>
     </documentation>
     <object class="org.nuxeo.ecm.sync.cmis.service.CMISAceMappingDescriptor" />

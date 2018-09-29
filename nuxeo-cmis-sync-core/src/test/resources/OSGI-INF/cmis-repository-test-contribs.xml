@@ -6,7 +6,7 @@
   <extension target="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent" point="repository">
     <repository name="test" enabled="true" binding="browser">
       <repository>default</repository>
-      <url>http://laptop:9090/nuxeo/json/cmis</url>
+      <url>http://localhost:8080/nuxeo/json/cmis</url>
       <username>Administrator</username>
       <credentials>Administrator</credentials>
     </repository>
@@ -19,9 +19,10 @@
   </extension>
 
   <extension target="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent" point="ace-mapping">
-    <mapping remoteACE="cmis:read" localACE="Read"/>
-    <mapping remoteACE="cmis:write" localACE="readWrite"/>
-    <mapping remoteACE="cmis:everything" localACE="Everything"/>
+    <ace-mapping remoteACE="cmis:read" localACE="Read"/>
+    <ace-mapping remoteACE="cmis:write" localACE="ReadWrite"/>
+    <ace-mapping remoteACE="cmis:all" localACE="Everything"/>
+    <ace-mapping remoteACE="Everything" localACE="Everything"/>
   </extension>
 
 </component>

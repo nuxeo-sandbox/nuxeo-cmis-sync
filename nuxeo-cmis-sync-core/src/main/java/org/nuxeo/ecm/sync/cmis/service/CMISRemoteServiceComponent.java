@@ -29,11 +29,11 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
 
     public static final String EP_MAPPING = "mapping";
 
-    public static final String EP_ACE_MAPPING = "acxe-mapping";
+    public static final String EP_ACE_MAPPING = "ace-mapping";
 
     protected Map<String, CMISMappingDescriptor> mappings = null;
 
-    protected Map<String, String> aceMappings = null;
+    protected Map<String, String> aceMapping = null;
 
     protected Map<String, CMISRepositoryDescriptor> repositories = null;
 
@@ -44,26 +44,27 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
     @Override
     public void activate(ComponentContext context) {
         mappings = new HashMap<>();
-        aceMappings = new HashMap<>();
+        aceMapping = new HashMap<>();
         repositories = new HashMap<>();
     }
 
     @Override
     public void deactivate(ComponentContext context) {
         mappings = null;
-        aceMappings = null;
+        aceMapping = null;
         repositories = null;
     }
 
     @Override
     public void registerContribution(Object contribution, String extensionPoint, ComponentInstance contributor) {
+
         if (EP_MAPPING.equals(extensionPoint)) {
             CMISMappingDescriptor desc = (CMISMappingDescriptor) contribution;
             String name = desc.getName();
             mappings.put(name, desc);
         } else if (EP_ACE_MAPPING.equals(extensionPoint)) {
             CMISAceMappingDescriptor desc = (CMISAceMappingDescriptor) contribution;
-            aceMappings.put(desc.getRemoteACE(), desc.getLocalACE());
+            aceMapping.put(desc.getRemoteACE(), desc.getLocalACE());
         } else if (EP_REPO.equals(extensionPoint)) {
             CMISRepositoryDescriptor desc = (CMISRepositoryDescriptor) contribution;
             String name = desc.getName();
@@ -87,7 +88,7 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
 
     @Override
     public Map<String, String> getAceMappings() {
-        return Collections.unmodifiableMap(aceMappings);
+        return Collections.unmodifiableMap(aceMapping);
     }
 
     @Override

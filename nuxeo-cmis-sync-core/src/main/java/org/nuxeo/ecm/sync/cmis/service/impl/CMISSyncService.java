@@ -8,16 +8,16 @@ public class CMISSyncService extends CMISSync {
 
     public CMISSyncService(CoreSession session, CMISRemoteService cmis) {
         super();
-        this.session = session;
+        this.coreSession = session;
         this.cmis = cmis;
     }
 
     public CoreSession getSession() {
-        return session;
+        return coreSession;
     }
 
     public void setSession(CoreSession session) {
-        this.session = session;
+        this.coreSession = session;
     }
 
     public CMISRemoteService getCmis() {

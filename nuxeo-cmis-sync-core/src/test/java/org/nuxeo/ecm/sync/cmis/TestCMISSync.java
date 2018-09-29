@@ -2,6 +2,9 @@ package org.nuxeo.ecm.sync.cmis;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
 
 import javax.inject.Inject;
 
@@ -21,11 +24,15 @@ import org.nuxeo.ecm.automation.test.AutomationFeature;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.NuxeoPrincipal;
+import org.nuxeo.ecm.core.api.security.ACE;
+import org.nuxeo.ecm.core.api.security.ACL;
 import org.nuxeo.ecm.core.event.EventService;
 import org.nuxeo.ecm.core.event.EventServiceAdmin;
 import org.nuxeo.ecm.core.test.DefaultRepositoryInit;
 import org.nuxeo.ecm.core.test.annotations.Granularity;
 import org.nuxeo.ecm.core.test.annotations.RepositoryConfig;
+import org.nuxeo.ecm.platform.usermanager.UserManager;
 import org.nuxeo.ecm.sync.cmis.api.CMISRemoteService;
 import org.nuxeo.runtime.test.runner.Deploy;
 import org.nuxeo.runtime.test.runner.Features;
@@ -39,6 +46,18 @@ public class TestCMISSync {
 
     private static final Log log = LogFactory.getLog(TestCMISSync.class);
 
+    // WARNING: This user and group must exist in the distant repo
+    public static final String TEST_USER = "john";
+
+    public static final String TEST_GROUP = "Finance";
+
+    // WARNING: This document must exist in the distant repo and
+    // its permissions have:
+    // members can ReadWrite
+    // Finance can readWrite
+    // john can Everything
+    public static final String REMOTE_DOC_PATH = "/default-domain/workspaces/Documents/orbeon-demo.pptx";
+
     @Inject
     protected CoreSession session;
 
@@ -50,6 +69,9 @@ public class TestCMISSync {
 
     @Inject
     protected EventServiceAdmin eventServiceAdmin;
+
+    @Inject
+    protected UserManager userManager;
 
     @Inject
     protected CMISRemoteService cmis;
@@ -69,6 +91,13 @@ public class TestCMISSync {
         src = session.createDocument(src);
         session.save();
         src = session.getDocument(src.getRef());
+
+        createGroup(TEST_GROUP);
+        createUser(TEST_USER);
+        NuxeoPrincipal principal = userManager.getPrincipal(TEST_USER);
+        principal.setGroups(Arrays.asList("members", TEST_GROUP));
+        userManager.updateUser(principal.getModel());
+
     }
 
     @Test
@@ -77,7 +106,7 @@ public class TestCMISSync {
         Assume.assumeTrue("No distant CMIS server can be reached", TestHelper.isTestCMISServerRunning(cmis));
 
         final String path = "/src/file";
-        final String remote = "/default-domain/workspaces/Documents/orbeon-demo.pptx";
+        final String remote = REMOTE_DOC_PATH;
 
         OperationContext ctx = new OperationContext(session);
         ctx.setInput(src);
@@ -99,10 +128,46 @@ public class TestCMISSync {
             } catch (InterruptedException e) {
             }
         }
+        doc.refresh();
+
         assertEquals(path, doc.getPathAsString());
         assertEquals("test", doc.getPropertyValue("cmissync:sync/connection"));
         assertEquals(526154, ((Blob) doc.getProperties("file").get("content")).getLength());
-        log.debug(doc.getProperties("cmissync"));
-        log.debug(doc.getProperties("dublincore"));
+        // log.debug(doc.getProperties("cmissync"));
+        // log.debug(doc.getProperties("dublincore"));
+
+        // In distant Nuxeo test repo, members have ReadWrite on this document
+        // It should have created a local specific CmisSync ACL
+        ACL acl = doc.getACP().getACL(CMISOperations.SYNC_ACL);
+        assertNotNull(acl);
+        boolean membersCanReadWrite = false;
+        boolean financeCanReadWrite = false;
+        boolean johnCanEverything = false;
+        for (ACE ace : acl.getACEs()) {
+            if ("members".equals(ace.getUsername()) && "ReadWrite".equals(ace.getPermission())) {
+                membersCanReadWrite = true;
+            } else if (TEST_GROUP.equals(ace.getUsername()) && "ReadWrite".equals(ace.getPermission())) {
+                financeCanReadWrite = true;
+            } else if (TEST_USER.equals(ace.getUsername()) && "Everything".equals(ace.getPermission())) {
+                johnCanEverything = true;
+            }
+        }
+        assertTrue(membersCanReadWrite);
+        assertTrue(financeCanReadWrite);
+        assertTrue(johnCanEverything);
+
+    }
+
+    protected void createUser(String userId) {
+        DocumentModel userModel = userManager.getBareUserModel();
+        userModel.setProperty("user", "username", userId);
+        userModel.setProperty("user", "password", userId);
+        userManager.createUser(userModel);
+    }
+
+    protected void createGroup(String groupId) {
+        DocumentModel groupModel = userManager.getBareGroupModel();
+        groupModel.setProperty("group", "groupname", groupId);
+        userManager.createGroup(groupModel);
     }
 }

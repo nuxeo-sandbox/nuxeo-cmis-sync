@@ -22,6 +22,8 @@ public abstract class CMISOperations {
 
     public static final String SYNC_DATA = "cmissync:sync";
 
+    public static final String SYNC_ACL = "CmisSync";
+
     private static final Log log = LogFactory.getLog(CMISOperations.class);
 
     public CMISOperations() {
