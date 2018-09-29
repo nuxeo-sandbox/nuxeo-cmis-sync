@@ -31,7 +31,8 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
 
     protected Map<String, CMISMappingDescriptor> mappings = null;
 
-    protected Map<String, String> aceMapping = null;
+    // Name of distant repo, ace-mapping for this repo
+    protected Map<String, Map<String, String>> aceMapping = null;
 
     protected Map<String, CMISRepositoryDescriptor> repositories = null;
 
@@ -73,7 +74,7 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
             }
 
             Map<String, String> loadedAceMapping = desc.getAceMapping();
-            aceMapping = Collections.unmodifiableMap(loadedAceMapping);
+            aceMapping.put(name, Collections.unmodifiableMap(loadedAceMapping));
 
             repositories.put(name, desc);
         }
@@ -85,8 +86,8 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
     }
 
     @Override
-    public Map<String, String> getAceMappings() {
-        return aceMapping;
+    public Map<String, String> getAceMappings(String repository) {
+        return aceMapping.get(repository);
     }
 
     @Override

@@ -32,7 +32,7 @@ public class TestHelper {
 
     public static boolean isTestCMISServerRunning(CMISRemoteService cmis) {
 
-        CMISRepositoryDescriptor desc = cmis.getRepositoryDescriptor("test");
+        CMISRepositoryDescriptor desc = cmis.getRepositoryDescriptor("remoteNuxeo");
         if (desc != null) {
             String urlStr = desc.getUrl();
             try {

@@ -53,7 +53,7 @@ public class TestService {
 
         Assume.assumeTrue("No distant CMIS server can be reached", TestHelper.isTestCMISServerRunning(cmis));
 
-        Session ses = cmis.createSession("test");
+        Session ses = cmis.createSession("remoteNuxeo");
         assertNotNull(ses);
         assertEquals("default", ses.getRepositoryInfo().getId());
     }

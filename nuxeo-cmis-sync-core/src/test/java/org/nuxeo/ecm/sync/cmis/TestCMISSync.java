@@ -114,7 +114,7 @@ public class TestCMISSync {
         OperationChain chain = new OperationChain("testChain");
         chain.add(FetchContextDocument.ID);
         chain.add(CreateDocument.ID).set("type", "File").set("name", "file").set("properties", "dc:title=MyDoc");
-        chain.add(CMISSync.ID).set("connection", "test").set("remoteRef", remote);
+        chain.add(CMISSync.ID).set("connection", "remoteNuxeo").set("remoteRef", remote);
 
         DocumentModel doc = (DocumentModel) service.run(ctx, chain);
         session.save();
@@ -131,7 +131,7 @@ public class TestCMISSync {
         doc.refresh();
 
         assertEquals(path, doc.getPathAsString());
-        assertEquals("test", doc.getPropertyValue("cmissync:sync/connection"));
+        assertEquals("remoteNuxeo", doc.getPropertyValue("cmissync:sync/connection"));
         assertEquals(526154, ((Blob) doc.getProperties("file").get("content")).getLength());
         // log.debug(doc.getProperties("cmissync"));
         // log.debug(doc.getProperties("dublincore"));

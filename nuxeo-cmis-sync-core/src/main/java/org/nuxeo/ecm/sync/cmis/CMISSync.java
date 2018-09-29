@@ -54,6 +54,8 @@ public class CMISSync extends CMISOperations {
     @Context
     protected CMISRemoteService cmis;
 
+    // Connection is the name of the main <repository></repository> object in the configuration
+    // If not passed, we read it in the schema
     @Param(name = "connection", required = false)
     protected String connection;
 
@@ -137,7 +139,7 @@ public class CMISSync extends CMISOperations {
             List<Ace> remoteACEs = remote.getAcl() == null ? null : remote.getAcl().getAces();
             ACP localAcp = model.getACP();
             if (remoteACEs != null) {
-                Map<String, String> aceMapping = cmis.getAceMappings();
+                Map<String, String> aceMapping = cmis.getAceMappings(connection);
 
                 // org.nuxeo.ecm.core.api.security.ACL [] acl = model.getACP().getACLs();
                 for (Ace ace : remoteACEs) {

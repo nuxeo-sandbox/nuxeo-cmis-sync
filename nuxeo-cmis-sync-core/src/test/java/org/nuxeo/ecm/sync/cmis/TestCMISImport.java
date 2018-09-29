@@ -85,11 +85,11 @@ public class TestCMISImport {
         OperationChain chain = new OperationChain("folderChain");
         chain.add(FetchContextDocument.ID);
         chain.add(CreateDocument.ID).set("type", "Folder").set("name", "folder").set("properties", "dc:title=AFolder");
-        chain.add(CMISSync.ID).set("connection", "test").set("remoteRef", remote);
+        chain.add(CMISSync.ID).set("connection", "remoteNuxeo").set("remoteRef", remote);
         chain.add(CMISImport.ID).set("state", "imported");
         DocumentModel doc = (DocumentModel) service.run(ctx, chain);
         session.save();
-        assertEquals("test", doc.getPropertyValue("cmissync:sync/connection"));
+        assertEquals("remoteNuxeo", doc.getPropertyValue("cmissync:sync/connection"));
 
         DocumentModelList dml = session.getChildren(doc.getRef());
         assertEquals(4, dml.size());

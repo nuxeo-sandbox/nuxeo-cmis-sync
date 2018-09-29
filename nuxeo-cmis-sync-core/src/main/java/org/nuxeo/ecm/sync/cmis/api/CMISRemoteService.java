@@ -19,7 +19,7 @@ public interface CMISRemoteService {
      * @return an unmodifiable map of elements whose key is the remote ACE, value is the local ACE to apply
      * @since 10.2
      */
-    Map<String, String> getAceMappings();
+    Map<String, String> getAceMappings(String reposiroty);
 
     Collection<String> getRepositoryNames();
 
