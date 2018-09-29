@@ -1,3 +1,21 @@
+/*
+ * (C) Copyright 2018 Nuxeo (http://nuxeo.com/) and others.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Contributors:
+ *     Damon Brown
+ */
 package org.nuxeo.ecm.sync.cmis;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -57,17 +75,17 @@ public class CMISImport extends CMISOperations {
         // Get document, check facet
         AtomicReference<String> remoteRef = new AtomicReference<>(this.remoteRef);
         AtomicBoolean idRef = new AtomicBoolean(this.idRef);
-        DocumentModel model = loadDocument(this.session, target, remoteRef, idRef);
+        DocumentModel model = loadDocument(session, target, remoteRef, idRef);
         if (!model.isFolder()) {
             throw new IllegalArgumentException("Cannot synchronize non-folderish documents");
         }
 
         // Validate repository
         Property p = model.getProperty(SYNC_DATA);
-        this.connection = validateConnection(p, this.connection);
+        connection = validateConnection(p, connection);
 
         // Obtain Session from CMIS component
-        Session repo = createSession(p, this.cmis);
+        Session repo = createSession(p, cmis);
 
         // Retrieve object
         CmisObject remote = loadObject(repo, remoteRef.get(), idRef.get());
@@ -115,7 +133,7 @@ public class CMISImport extends CMISOperations {
         }
 
         try {
-            DocumentModel child = this.session.createDocumentModel(model.getPathAsString(), obj.getName(), docType);
+            DocumentModel child = session.createDocumentModel(model.getPathAsString(), obj.getName(), docType);
             child.addFacet("cmissync");
             child.setPropertyValue("dc:title", obj.getName());
             child.setPropertyValue(REMOTE_UID, obj.getId());
@@ -124,11 +142,11 @@ public class CMISImport extends CMISOperations {
                 child.getProperty(SYNC_DATA + "/paths").setValue(((FileableCmisObject) obj).getPaths());
             }
 
-            child.setPropertyValue(SYNC_DATA + "/connection", this.connection);
+            child.setPropertyValue(SYNC_DATA + "/connection", connection);
             child.setPropertyValue(SYNC_DATA + "/repository", p.getValue("repository"));
-            child.setPropertyValue(SYNC_DATA + "/state", this.state);
+            child.setPropertyValue(SYNC_DATA + "/state", state);
 
-            child = this.session.getOrCreateDocument(child);
+            child = session.getOrCreateDocument(child);
         } catch (Exception ex) {
             log.error("Error creating document", ex);
             throw new RuntimeException(ex);
