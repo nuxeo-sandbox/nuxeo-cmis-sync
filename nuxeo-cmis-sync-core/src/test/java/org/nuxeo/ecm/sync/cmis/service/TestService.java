@@ -54,16 +54,20 @@ public class TestService {
 
         Assume.assumeTrue("No distant CMIS server can be reached", TestHelper.isTestCMISServerRunning(cmis, TestHelper.TEST_CONNECTION_REMOTE_NUXEO));
 
-        Session ses = cmis.createSession("remoteNuxeo");
+        Session ses = cmis.createSession(TestHelper.TEST_CONNECTION_REMOTE_NUXEO);
         assertNotNull(ses);
         assertEquals("default", ses.getRepositoryInfo().getId());
     }
 
+    @Test
     public void testRepositoryMapping() throws Exception {
-        assertEquals(1, cmis.getMappings(null).size());
-        assertEquals(1, cmis.getMappings("Document").size());
-        assertEquals(2, cmis.getMappings("Folder").size());
-        assertEquals(2, cmis.getMappings("Picture").size());
+        // We are testing the configuration. See cmis-repository-test-contribs.xml
+        // 3 mappings in total. 1 for all, 1 for File, 1 for Picture
+        assertEquals(3, cmis.getFieldMapping(TestHelper.TEST_CONNECTION_REMOTE_NUXEO, null).size());
+        assertEquals(1, cmis.getFieldMapping(TestHelper.TEST_CONNECTION_REMOTE_NUXEO, "Document").size());
+        assertEquals(1, cmis.getFieldMapping(TestHelper.TEST_CONNECTION_REMOTE_NUXEO, "Folder").size());
+        assertEquals(2, cmis.getFieldMapping(TestHelper.TEST_CONNECTION_REMOTE_NUXEO, "File").size());
+        assertEquals(2, cmis.getFieldMapping(TestHelper.TEST_CONNECTION_REMOTE_NUXEO, "Picture").size());
     }
 
 }

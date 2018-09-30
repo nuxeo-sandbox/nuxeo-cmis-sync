@@ -10,16 +10,6 @@
     <provide interface="org.nuxeo.ecm.sync.cmis.api.CMISRemoteService" />
   </service>
 
-  <extension-point name="mapping">
-    <documentation>
-      example:
-      <code>
-        <mapping name="" xpath="" property="" doctype="" />
-      </code>
-    </documentation>
-    <object class="org.nuxeo.ecm.sync.cmis.service.CMISMappingDescriptor" />
-  </extension-point>
-
   <extension-point name="connection">
     <documentation>
       example:
@@ -31,7 +21,16 @@
           <credentials>123</credentials>
           <property key="prop1">123</property>
           <property key="prop2">something</property>
-          
+
+          <!-- Example of a list of ACE mapping -->
+          <field-mapping name="Copy Description for Everything" xpath="dc:description"
+            property="dc:description" />
+          <field-mapping name="Copy coverage for files" xpath="dc:coverage" property="dc:coverage"
+            doctype="File" />
+          <field-mapping name="Update value for picture" xpath="c:c" property="prop_c" doctype="Picture" />
+          <field-mapping name="Map custom distant field for files" xpath="contractNum" property="customschema:contract"
+            doctype="File" />
+
           <!-- Example of a list of ACE mapping -->
           <ace-mapping>
             <remoteAce value="permToRead">Read</remoteAce>

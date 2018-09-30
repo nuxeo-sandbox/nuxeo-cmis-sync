@@ -23,8 +23,8 @@ import java.io.Serializable;
 import org.nuxeo.common.xmap.annotation.XNode;
 import org.nuxeo.common.xmap.annotation.XObject;
 
-@XObject("mapping")
-public class CMISMappingDescriptor implements Serializable {
+@XObject("field-mapping")
+public class CMISFieldMappingDescriptor implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -40,7 +40,7 @@ public class CMISMappingDescriptor implements Serializable {
     @XNode("@doctype")
     protected String doctype;
 
-    public CMISMappingDescriptor() {
+    public CMISFieldMappingDescriptor() {
         super();
     }
 

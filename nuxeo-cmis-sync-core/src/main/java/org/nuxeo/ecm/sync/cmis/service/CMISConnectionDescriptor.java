@@ -20,10 +20,13 @@
 package org.nuxeo.ecm.sync.cmis.service;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.nuxeo.common.xmap.annotation.XNode;
+import org.nuxeo.common.xmap.annotation.XNodeList;
 import org.nuxeo.common.xmap.annotation.XNodeMap;
 import org.nuxeo.common.xmap.annotation.XObject;
 
@@ -55,6 +58,9 @@ public class CMISConnectionDescriptor implements Serializable {
 
     @XNodeMap(value = "property", key = "@key", type = HashMap.class, componentType = String.class)
     protected Map<String, String> properties = new HashMap<>();
+
+    @XNodeList(value="field-mapping", componentType = CMISFieldMappingDescriptor.class, type = ArrayList.class)
+    protected List<CMISFieldMappingDescriptor> fieldMapping = new ArrayList<>();
 
     @XNodeMap(value = "ace-mapping/remoteAce", key = "@value", type = HashMap.class, componentType = String.class)
     protected Map<String, String> aceMapping = new HashMap<>();
@@ -133,6 +139,10 @@ public class CMISConnectionDescriptor implements Serializable {
 
     public void setAceMapping(Map<String, String> aceMapping) {
         this.aceMapping = aceMapping;
+    }
+
+    public List<CMISFieldMappingDescriptor> getFieldMapping() {
+        return fieldMapping;
     }
 
 }

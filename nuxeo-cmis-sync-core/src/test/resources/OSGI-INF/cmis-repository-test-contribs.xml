@@ -10,6 +10,12 @@
       <username>Administrator</username>
       <credentials>Administrator</credentials>
 
+      <field-mapping name="Copy Description for Everything" xpath="dc:description"
+        property="dc:description" />
+      <field-mapping name="Copy coverage for files" xpath="dc:coverage" property="dc:coverage"
+        doctype="File" />
+      <field-mapping name="Update value for picture" xpath="c:c" property="prop_c" doctype="Picture" />
+
       <ace-mapping>
         <remoteAce value="cmis:read">Read</remoteAce>
         <remoteAce value="cmis:write">ReadWrite</remoteAce>
@@ -19,11 +25,4 @@
 
     </connection>
   </extension>
-
-  <extension target="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent" point="mapping">
-    <mapping name="Copy Description for Everything" xpath="dc:description" property="dc:description" />
-    <mapping name="Copy coverage for files" xpath="dc:coverage" property="dc:coverage" doctype="File" />
-    <mapping name="Update value for picture" xpath="c:c" property="prop_c" doctype="Picture" />
-  </extension>
-
 </component>

@@ -46,11 +46,10 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
 
     public static final String EP_CONNECTION = "connection";
 
-    public static final String EP_MAPPING = "mapping";
+    // Name of connection, Mapp of mapping name/values for this connection
+    protected Map<String, Map<String, CMISFieldMappingDescriptor>> fieldMapping = null;
 
-    protected Map<String, CMISMappingDescriptor> mappings = null;
-
-    // Name of distant repo, ace-mapping for this repo
+    // Name of connection, ace-mapping for this connection
     protected Map<String, Map<String, String>> aceMapping = null;
 
     protected Map<String, CMISConnectionDescriptor> connections = null;
@@ -61,14 +60,14 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
 
     @Override
     public void activate(ComponentContext context) {
-        mappings = new HashMap<>();
+        fieldMapping = new HashMap<>();
         aceMapping = new HashMap<>();
         connections = new HashMap<>();
     }
 
     @Override
     public void deactivate(ComponentContext context) {
-        mappings = null;
+        fieldMapping = null;
         aceMapping = null;
         connections = null;
     }
@@ -76,11 +75,7 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
     @Override
     public void registerContribution(Object contribution, String extensionPoint, ComponentInstance contributor) {
 
-        if (EP_MAPPING.equals(extensionPoint)) {
-            CMISMappingDescriptor desc = (CMISMappingDescriptor) contribution;
-            String name = desc.getName();
-            mappings.put(name, desc);
-        } else if (EP_CONNECTION.equals(extensionPoint)) {
+        if (EP_CONNECTION.equals(extensionPoint)) {
             CMISConnectionDescriptor desc = (CMISConnectionDescriptor) contribution;
             String name = desc.getName();
 
@@ -88,25 +83,33 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
 
             if (!desc.isEnabled()) {
                 connections.remove(name);
-                log.info("COnnection configured to not be enabled: " + name);
+                log.info("Connection configured to not be enabled: " + name);
                 return;
             }
 
             Map<String, String> loadedAceMapping = desc.getAceMapping();
             aceMapping.put(name, Collections.unmodifiableMap(loadedAceMapping));
 
+            List<CMISFieldMappingDescriptor> loadedFieldMapping = desc.getFieldMapping();
+            Map<String, CMISFieldMappingDescriptor> fieldMappingMap = new HashMap<>();
+            loadedFieldMapping.forEach(oneDesc -> {
+                fieldMappingMap.put(oneDesc.getName(), oneDesc);
+            });
+            fieldMapping.put(name, fieldMappingMap);
+
             connections.put(name, desc);
         }
     }
 
     @Override
-    public List<CMISMappingDescriptor> getMappings(String doctype) {
-        return mappings.values().stream().filter(m -> m.matches(doctype)).collect(Collectors.toList());
+    public List<CMISFieldMappingDescriptor> getFieldMapping(String connection, String doctype) {
+        Map<String, CMISFieldMappingDescriptor> fieldMappingMap = fieldMapping.get(connection);
+        return fieldMappingMap.values().stream().filter(m -> m.matches(doctype)).collect(Collectors.toList());
     }
 
     @Override
-    public Map<String, String> getAceMappings(String repository) {
-        return aceMapping.get(repository);
+    public Map<String, String> getAceMappings(String connection) {
+        return aceMapping.get(connection);
     }
 
     @Override

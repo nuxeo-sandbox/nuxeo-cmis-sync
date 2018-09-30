@@ -55,7 +55,7 @@ import org.nuxeo.ecm.core.api.security.impl.ACPImpl;
 import org.nuxeo.ecm.platform.usermanager.UserManager;
 import org.nuxeo.ecm.sync.cmis.api.CMISRemoteService;
 import org.nuxeo.ecm.sync.cmis.api.CMISServiceConstants;
-import org.nuxeo.ecm.sync.cmis.service.CMISMappingDescriptor;
+import org.nuxeo.ecm.sync.cmis.service.CMISFieldMappingDescriptor;
 import org.nuxeo.runtime.api.Framework;
 
 /**
@@ -121,8 +121,8 @@ public class CMISSync extends CMISOperations {
         // Update document
         if (requiresUpdate(remote, model, force)) {
             // Update fields
-            List<CMISMappingDescriptor> descs = cmis.getMappings(model.getDocumentType().getName());
-            for (CMISMappingDescriptor desc : descs) {
+            List<CMISFieldMappingDescriptor> descs = cmis.getFieldMapping(connection, model.getDocumentType().getName());
+            for (CMISFieldMappingDescriptor desc : descs) {
                 Object val = remote.getPropertyValue(desc.getProperty());
                 Property dp = model.getProperty(desc.getXpath());
                 if (val != null) {

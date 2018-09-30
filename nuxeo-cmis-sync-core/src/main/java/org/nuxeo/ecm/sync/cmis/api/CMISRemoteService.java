@@ -24,14 +24,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.chemistry.opencmis.client.api.Session;
-import org.nuxeo.ecm.sync.cmis.service.CMISMappingDescriptor;
 import org.nuxeo.ecm.sync.cmis.service.CMISConnectionDescriptor;
+import org.nuxeo.ecm.sync.cmis.service.CMISFieldMappingDescriptor;
 
 public interface CMISRemoteService {
 
     Session createSession(String name);
 
-    List<CMISMappingDescriptor> getMappings(String doctype);
+    List<CMISFieldMappingDescriptor> getFieldMapping(String connection, String doctype);
 
     /**
      *
