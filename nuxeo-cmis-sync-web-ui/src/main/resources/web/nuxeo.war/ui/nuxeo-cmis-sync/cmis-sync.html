@@ -112,8 +112,8 @@ Example:
           this.remotePath = "";
           this.uid = this.document.uid;
         }
-        if (this.configured == "no" && this.document && this.document.properties["cmissync:sync"]) {
-          var val = this.document.properties["cmissync:sync"]["connection"];
+        if (this.configured == "no" && this.document && this.hasFacet(this.document, "cmissync")) {
+          var val = this.document.properties["cmissync:connection"];
           if (val) {
             this.connection = val;
           }
@@ -121,7 +121,7 @@ Example:
           if (val && val != "") {
             this.remotePath = val;
           } else {
-            val = this.document.properties["cmissync:sync"]["paths"];
+            val = this.document.properties["cmissync:paths"];
             if (val && val.length > 0) {
               this.remotePath = val[0];
             }
