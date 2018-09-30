@@ -52,7 +52,7 @@ public class TestService {
     @Test
     public void testRepositoryConnection() throws Exception {
 
-        Assume.assumeTrue("No distant CMIS server can be reached", TestHelper.isTestCMISServerRunning(cmis));
+        Assume.assumeTrue("No distant CMIS server can be reached", TestHelper.isTestCMISServerRunning(cmis, TestHelper.TEST_CONNECTION_REMOTE_NUXEO));
 
         Session ses = cmis.createSession("remoteNuxeo");
         assertNotNull(ses);

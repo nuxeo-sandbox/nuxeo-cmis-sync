@@ -30,9 +30,11 @@ import org.nuxeo.ecm.sync.cmis.service.CMISConnectionDescriptor;
  */
 public class TestHelper {
 
-    public static boolean isTestCMISServerRunning(CMISRemoteService cmis) {
+    public static final String TEST_CONNECTION_REMOTE_NUXEO = "remoteNuxeo";
 
-        CMISConnectionDescriptor desc = cmis.getConnectionDescriptor("remoteNuxeo");
+    public static boolean isTestCMISServerRunning(CMISRemoteService cmis, String connection) {
+
+        CMISConnectionDescriptor desc = cmis.getConnectionDescriptor(connection);
         if (desc != null) {
             String urlStr = desc.getUrl();
             try {

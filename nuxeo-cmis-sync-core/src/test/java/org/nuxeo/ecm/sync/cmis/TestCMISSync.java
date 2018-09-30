@@ -123,7 +123,7 @@ public class TestCMISSync {
     @Test
     public void shouldCallWithParameters() throws OperationException {
 
-        Assume.assumeTrue("No distant CMIS server can be reached", TestHelper.isTestCMISServerRunning(cmis));
+        Assume.assumeTrue("No distant CMIS server can be reached", TestHelper.isTestCMISServerRunning(cmis, TestHelper.TEST_CONNECTION_REMOTE_NUXEO));
 
         final String path = "/src/file";
         final String remote = REMOTE_DOC_PATH;
@@ -134,7 +134,7 @@ public class TestCMISSync {
         OperationChain chain = new OperationChain("testChain");
         chain.add(FetchContextDocument.ID);
         chain.add(CreateDocument.ID).set("type", "File").set("name", "file").set("properties", "dc:title=MyDoc");
-        chain.add(CMISSync.ID).set("connection", "remoteNuxeo").set("remoteRef", remote);
+        chain.add(CMISSync.ID).set("connection", TestHelper.TEST_CONNECTION_REMOTE_NUXEO).set("remoteRef", remote);
 
         DocumentModel doc = (DocumentModel) service.run(ctx, chain);
         session.save();
@@ -151,7 +151,7 @@ public class TestCMISSync {
         doc.refresh();
 
         assertEquals(path, doc.getPathAsString());
-        assertEquals("remoteNuxeo", doc.getPropertyValue("cmissync:connection"));
+        assertEquals("remoteNuxeo", doc.getPropertyValue(CMISServiceConstants.XPATH_CONNECTION));
         assertEquals(526154, ((Blob) doc.getProperties("file").get("content")).getLength());
 
         // In distant Nuxeo test repo, members have ReadWrite on this document

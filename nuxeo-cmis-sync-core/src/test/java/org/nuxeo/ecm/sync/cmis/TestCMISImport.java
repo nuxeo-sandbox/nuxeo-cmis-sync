@@ -45,6 +45,7 @@ import org.nuxeo.ecm.core.test.DefaultRepositoryInit;
 import org.nuxeo.ecm.core.test.annotations.Granularity;
 import org.nuxeo.ecm.core.test.annotations.RepositoryConfig;
 import org.nuxeo.ecm.sync.cmis.api.CMISRemoteService;
+import org.nuxeo.ecm.sync.cmis.api.CMISServiceConstants;
 import org.nuxeo.runtime.test.runner.Deploy;
 import org.nuxeo.runtime.test.runner.Features;
 import org.nuxeo.runtime.test.runner.FeaturesRunner;
@@ -93,7 +94,7 @@ public class TestCMISImport {
     @Test
     public void shouldCallWithParameters() throws OperationException {
 
-        Assume.assumeTrue("No distant CMIS server can be reached", TestHelper.isTestCMISServerRunning(cmis));
+        Assume.assumeTrue("No distant CMIS server can be reached", TestHelper.isTestCMISServerRunning(cmis, TestHelper.TEST_CONNECTION_REMOTE_NUXEO));
 
         final String remote = "/default-domain/workspaces/Documents";
 
@@ -103,11 +104,11 @@ public class TestCMISImport {
         OperationChain chain = new OperationChain("folderChain");
         chain.add(FetchContextDocument.ID);
         chain.add(CreateDocument.ID).set("type", "Folder").set("name", "folder").set("properties", "dc:title=AFolder");
-        chain.add(CMISSync.ID).set("connection", "remoteNuxeo").set("remoteRef", remote);
+        chain.add(CMISSync.ID).set("connection", TestHelper.TEST_CONNECTION_REMOTE_NUXEO).set("remoteRef", remote);
         chain.add(CMISImport.ID).set("state", "imported");
         DocumentModel doc = (DocumentModel) service.run(ctx, chain);
         session.save();
-        assertEquals("remoteNuxeo", doc.getPropertyValue("cmissync:connection"));
+        assertEquals(TestHelper.TEST_CONNECTION_REMOTE_NUXEO, doc.getPropertyValue(CMISServiceConstants.XPATH_CONNECTION));
 
         DocumentModelList dml = session.getChildren(doc.getRef());
         assertEquals(4, dml.size());
@@ -131,7 +132,6 @@ public class TestCMISImport {
 
         dml = session.getChildren(doc.getRef());
         assertEquals(4, dml.size());
-        dml.forEach(dl -> log.debug(dl.getProperties("cmissync")));
 
     }
 }
