@@ -3,8 +3,8 @@
 
   <require>org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent</require>
 
-  <extension target="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent" point="repository">
-    <repository name="remoteNuxeo" enabled="true" binding="browser">
+  <extension target="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent" point="connection">
+    <connection name="remoteNuxeo" enabled="true" binding="browser">
       <repository>default</repository>
       <url>http://localhost:8080/nuxeo/json/cmis</url>
       <username>Administrator</username>
@@ -17,7 +17,7 @@
         <remoteAce value="Everything">Everything</remoteAce>
       </ace-mapping>
 
-    </repository>
+    </connection>
   </extension>
 
   <extension target="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent" point="mapping">

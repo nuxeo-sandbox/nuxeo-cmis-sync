@@ -27,8 +27,8 @@ import org.nuxeo.common.xmap.annotation.XNode;
 import org.nuxeo.common.xmap.annotation.XNodeMap;
 import org.nuxeo.common.xmap.annotation.XObject;
 
-@XObject("repository")
-public class CMISRepositoryDescriptor implements Serializable {
+@XObject("connection")
+public class CMISConnectionDescriptor implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -59,7 +59,7 @@ public class CMISRepositoryDescriptor implements Serializable {
     @XNodeMap(value = "ace-mapping/remoteAce", key = "@value", type = HashMap.class, componentType = String.class)
     protected Map<String, String> aceMapping = new HashMap<>();
 
-    public CMISRepositoryDescriptor() {
+    public CMISConnectionDescriptor() {
         super();
     }
 

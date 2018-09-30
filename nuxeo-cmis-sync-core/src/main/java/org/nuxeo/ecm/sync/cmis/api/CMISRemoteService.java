@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.nuxeo.ecm.sync.cmis.service.CMISMappingDescriptor;
-import org.nuxeo.ecm.sync.cmis.service.CMISRepositoryDescriptor;
+import org.nuxeo.ecm.sync.cmis.service.CMISConnectionDescriptor;
 
 public interface CMISRemoteService {
 
@@ -42,6 +42,6 @@ public interface CMISRemoteService {
 
     Collection<String> getRepositoryNames();
 
-    CMISRepositoryDescriptor getRepositoryDescriptor(String repository);
+    CMISConnectionDescriptor getConnectionDescriptor(String repository);
 
 }

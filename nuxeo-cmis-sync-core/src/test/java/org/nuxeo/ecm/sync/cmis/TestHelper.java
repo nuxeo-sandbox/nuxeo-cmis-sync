@@ -23,7 +23,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 
 import org.nuxeo.ecm.sync.cmis.api.CMISRemoteService;
-import org.nuxeo.ecm.sync.cmis.service.CMISRepositoryDescriptor;
+import org.nuxeo.ecm.sync.cmis.service.CMISConnectionDescriptor;
 
 /**
  * @since 10.2
@@ -32,7 +32,7 @@ public class TestHelper {
 
     public static boolean isTestCMISServerRunning(CMISRemoteService cmis) {
 
-        CMISRepositoryDescriptor desc = cmis.getRepositoryDescriptor("remoteNuxeo");
+        CMISConnectionDescriptor desc = cmis.getConnectionDescriptor("remoteNuxeo");
         if (desc != null) {
             String urlStr = desc.getUrl();
             try {

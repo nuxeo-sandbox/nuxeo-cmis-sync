@@ -44,7 +44,7 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
 
     private static final Log log = LogFactory.getLog(CMISRemoteServiceComponent.class);
 
-    public static final String EP_REPO = "repository";
+    public static final String EP_CONNECTION = "connection";
 
     public static final String EP_MAPPING = "mapping";
 
@@ -53,7 +53,7 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
     // Name of distant repo, ace-mapping for this repo
     protected Map<String, Map<String, String>> aceMapping = null;
 
-    protected Map<String, CMISRepositoryDescriptor> repositories = null;
+    protected Map<String, CMISConnectionDescriptor> connections = null;
 
     public CMISRemoteServiceComponent() {
         super();
@@ -63,14 +63,14 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
     public void activate(ComponentContext context) {
         mappings = new HashMap<>();
         aceMapping = new HashMap<>();
-        repositories = new HashMap<>();
+        connections = new HashMap<>();
     }
 
     @Override
     public void deactivate(ComponentContext context) {
         mappings = null;
         aceMapping = null;
-        repositories = null;
+        connections = null;
     }
 
     @Override
@@ -80,22 +80,22 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
             CMISMappingDescriptor desc = (CMISMappingDescriptor) contribution;
             String name = desc.getName();
             mappings.put(name, desc);
-        } else if (EP_REPO.equals(extensionPoint)) {
-            CMISRepositoryDescriptor desc = (CMISRepositoryDescriptor) contribution;
+        } else if (EP_CONNECTION.equals(extensionPoint)) {
+            CMISConnectionDescriptor desc = (CMISConnectionDescriptor) contribution;
             String name = desc.getName();
 
-            log.debug("Registering repository: " + name);
+            log.debug("Registering connection: " + name + "n repository: " + desc.getRepository());
 
             if (!desc.isEnabled()) {
-                repositories.remove(name);
-                log.info("Repository configured to not be enabled: " + name);
+                connections.remove(name);
+                log.info("COnnection configured to not be enabled: " + name);
                 return;
             }
 
             Map<String, String> loadedAceMapping = desc.getAceMapping();
             aceMapping.put(name, Collections.unmodifiableMap(loadedAceMapping));
 
-            repositories.put(name, desc);
+            connections.put(name, desc);
         }
     }
 
@@ -111,12 +111,12 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
 
     @Override
     public Collection<String> getRepositoryNames() {
-        return Collections.unmodifiableSet(repositories.keySet());
+        return Collections.unmodifiableSet(connections.keySet());
     }
 
     @Override
     public Session createSession(String repository) {
-        CMISRepositoryDescriptor desc = repositories.get(repository);
+        CMISConnectionDescriptor desc = connections.get(repository);
         if (desc == null) {
             throw new IllegalArgumentException("No such repository: " + repository);
         }
@@ -154,8 +154,8 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
     }
 
     @Override
-    public CMISRepositoryDescriptor getRepositoryDescriptor(String repository) {
-        return repositories.get(repository);
+    public CMISConnectionDescriptor getConnectionDescriptor(String repository) {
+        return connections.get(repository);
     }
 
 }

@@ -20,26 +20,28 @@
     <object class="org.nuxeo.ecm.sync.cmis.service.CMISMappingDescriptor" />
   </extension-point>
 
-  <extension-point name="repository">
+  <extension-point name="connection">
     <documentation>
       example:
       <code>
-        <repository name="remoteNuxeo" enabled="true" binding="repository">
+        <connection name="remoteNuxeo" enabled="true" binding="repository">
           <repository>default</repository>
           <url>http://some.server.com/nuxeo/json/cmis</url>
           <username>Administrator</username>
           <credentials>123</credentials>
-          <property key=""></property>
+          <property key="prop1">123</property>
+          <property key="prop2">something</property>
+          
           <!-- Example of a list of ACE mapping -->
           <ace-mapping>
             <remoteAce value="permToRead">Read</remoteAce>
             <remoteAce value="permToWrite">ReadWrite</remoteAce>
             <remoteAce value="permFprAll">Everything</remoteAce>
           </ace-mapping>
-        </repository>
+        </connection>
       </code>
     </documentation>
-    <object class="org.nuxeo.ecm.sync.cmis.service.CMISRepositoryDescriptor" />
+    <object class="org.nuxeo.ecm.sync.cmis.service.CMISConnectionDescriptor" />
   </extension-point>
 
 </component>
