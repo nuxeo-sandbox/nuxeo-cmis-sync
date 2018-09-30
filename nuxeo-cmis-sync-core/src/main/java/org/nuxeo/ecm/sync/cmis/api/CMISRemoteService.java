@@ -35,13 +35,13 @@ public interface CMISRemoteService {
 
     /**
      *
-     * @return an unmodifiable map of elements whose key is the remote ACE, value is the local ACE to apply
+     * @return (for the connection) an unmodifiable map of elements whose key is the remote ACE, value is the local ACE to apply
      * @since 10.2
      */
-    Map<String, String> getAceMappings(String repository);
+    Map<String, String> getAceMappings(String connection);
 
     Collection<String> getRepositoryNames();
 
-    CMISConnectionDescriptor getConnectionDescriptor(String repository);
+    CMISConnectionDescriptor getConnectionDescriptor(String connection);
 
 }

@@ -115,10 +115,10 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
     }
 
     @Override
-    public Session createSession(String repository) {
-        CMISConnectionDescriptor desc = connections.get(repository);
+    public Session createSession(String connection) {
+        CMISConnectionDescriptor desc = connections.get(connection);
         if (desc == null) {
-            throw new IllegalArgumentException("No such repository: " + repository);
+            throw new IllegalArgumentException("No such connection: " + connection);
         }
 
         SessionFactory sessionFactory = SessionFactoryImpl.newInstance();
@@ -154,8 +154,8 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
     }
 
     @Override
-    public CMISConnectionDescriptor getConnectionDescriptor(String repository) {
-        return connections.get(repository);
+    public CMISConnectionDescriptor getConnectionDescriptor(String connection) {
+        return connections.get(connection);
     }
 
 }
