@@ -77,13 +77,13 @@ public class FolderishListener implements EventListener, PostCommitEventListener
     private boolean filterDoc(DocumentModel model) {
         return model != null && model.hasFacet("cmissync") && model.hasFacet("Folderish")
                 && model.getPropertyValue("cmissync:uid") != null
-                && model.getPropertyValue("cmissync:sync/state") != null
-                && model.getPropertyValue("cmissync:sync/state").equals("sync");
+                && model.getPropertyValue("cmissync:state") != null
+                && model.getPropertyValue("cmissync:state").equals("sync");
     }
 
     private void execute(DocumentEventContext context) {
         DocumentModel model = context.getSourceDocument();
-        model.setPropertyValue("cmissync:sync/state", "traversed");
+        model.setPropertyValue("cmissync:state", "traversed");
 
         CMISImportService imp = new CMISImportService(context.getCoreSession(), cmis);
         imp.setState("queued");

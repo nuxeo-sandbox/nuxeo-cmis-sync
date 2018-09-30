@@ -107,11 +107,10 @@ public class TestCMISImport {
         chain.add(CMISImport.ID).set("state", "imported");
         DocumentModel doc = (DocumentModel) service.run(ctx, chain);
         session.save();
-        assertEquals("remoteNuxeo", doc.getPropertyValue("cmissync:sync/connection"));
+        assertEquals("remoteNuxeo", doc.getPropertyValue("cmissync:connection"));
 
         DocumentModelList dml = session.getChildren(doc.getRef());
         assertEquals(4, dml.size());
-        dml.forEach(dl -> log.debug(dl.getProperties("cmissync")));
 
         chain = new OperationChain("syncChain");
         for (DocumentModel dm : dml) {

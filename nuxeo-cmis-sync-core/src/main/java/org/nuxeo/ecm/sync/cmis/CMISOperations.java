@@ -19,6 +19,7 @@
  */
 package org.nuxeo.ecm.sync.cmis;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -35,13 +36,9 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.sync.cmis.api.CMISRemoteService;
 
+import static org.nuxeo.ecm.sync.cmis.api.CMISServiceConstants.*;
+
 public abstract class CMISOperations {
-
-    public static final String REMOTE_UID = "cmissync:uid";
-
-    public static final String SYNC_DATA = "cmissync:sync";
-
-    public static final String SYNC_ACL = "CmisSync";
 
     private static final Log log = LogFactory.getLog(CMISOperations.class);
 
@@ -58,12 +55,12 @@ public abstract class CMISOperations {
             throw new NullPointerException("document");
         }
         DocumentModel model = target;
-        if (!model.hasFacet("cmissync")) {
-            model.addFacet("cmissync");
+        if (!model.hasFacet(SYNC_FACET)) {
+            model.addFacet(SYNC_FACET);
         }
 
         if (remoteRef.get() == null) {
-            remoteRef.set((String) model.getPropertyValue(REMOTE_UID));
+            remoteRef.set((String) model.getPropertyValue(XPATH_REMOTE_UID));
             idRef.set(true);
             if (remoteRef.get() == null) {
                 throw new IllegalArgumentException("UID or path required for sync");
@@ -72,8 +69,8 @@ public abstract class CMISOperations {
         return model;
     }
 
-    protected String validateConnection(Property p, String connection) {
-        Property connect = p.get("connection");
+    protected String validateConnection(Property connectionProperty, String connection) {
+        Property connect = connectionProperty;
         if (connect.getValue() != null && connection != null) {
             if (!connect.getValue().equals(connection)) {
                 throw new IllegalArgumentException("Mis-matched repository connection");
@@ -86,15 +83,14 @@ public abstract class CMISOperations {
         return connection;
     }
 
-    protected Session createSession(Property p, CMISRemoteService cmis) {
-        Session repo = cmis.createSession((String) p.getValue("connection"));
+    protected Session createSession(String connection, Property repositoryProperty, CMISRemoteService cmis) {
+        Session repo = cmis.createSession(connection);
         String repoId = repo.getRepositoryInfo().getId();
-        Property syncRepo = p.get("repository");
-        if (syncRepo.getValue() == null) {
-            syncRepo.setValue(repoId);
-        } else if (!syncRepo.getValue().equals(repoId)) {
+        if (repositoryProperty.getValue() == null) {
+            repositoryProperty.setValue(repoId);
+        } else if (!repositoryProperty.getValue().equals(repoId)) {
             throw new IllegalArgumentException(
-                    "Mis-matched remote repository identifier: " + syncRepo.getValue() + " != " + repoId);
+                    "Mis-matched remote repository identifier: " + repositoryProperty.getValue() + " != " + repoId);
         }
         return repo;
     }
@@ -123,37 +119,38 @@ public abstract class CMISOperations {
         return remote;
     }
 
-    protected void checkObject(CmisObject remote, DocumentModel model, Property p) {
+    protected void checkObject(CmisObject remote, DocumentModel model) {
         // Set required identifying information
-        if (model.getPropertyValue(REMOTE_UID) == null) {
-            model.setPropertyValue(REMOTE_UID, remote.getId());
-            p.get("type").setValue(remote.getBaseTypeId().value());
+        if (model.getPropertyValue(XPATH_REMOTE_UID) == null) {
+            model.setPropertyValue(XPATH_REMOTE_UID, remote.getId());
+            model.setPropertyValue(XPATH_TYPE, remote.getBaseTypeId().value());
+
             if (remote instanceof FileableCmisObject) {
                 FileableCmisObject pathy = (FileableCmisObject) remote;
-                p.get("paths").setValue(pathy.getPaths());
+                model.setPropertyValue(XPATH_PATHS, (Serializable) pathy.getPaths());
             }
-        } else if (!model.getPropertyValue(REMOTE_UID).equals(remote.getId())) {
-            throw new IllegalArgumentException("Mis-matched remote document UUID: " + model.getPropertyValue(REMOTE_UID)
-                    + " != " + remote.getId());
+        } else if (!model.getPropertyValue(XPATH_REMOTE_UID).equals(remote.getId())) {
+            throw new IllegalArgumentException("Mis-matched remote document UUID: "
+                    + model.getPropertyValue(XPATH_REMOTE_UID) + " != " + remote.getId());
         }
     }
 
-    protected boolean requiresUpdate(CmisObject remote, Property p, boolean force) {
+    protected boolean requiresUpdate(CmisObject remote, DocumentModel doc, boolean force) {
         // Check Last Modified
-        Property syncTime = p.get("synchronized");
-        GregorianCalendar syncRef = (GregorianCalendar) syncTime.getValue();
+        GregorianCalendar syncRef = (GregorianCalendar) doc.getPropertyValue(XPATH_SYNCHRONIZED);
         GregorianCalendar cal = remote.getLastModificationDate();
 
         return force || syncRef == null || cal.after(syncRef);
     }
 
-    protected void updateSyncAttributes(CmisObject remote, Property p, String state) {
+    protected DocumentModel  updateSyncAttributes(CmisObject remote, DocumentModel doc, String state) {
         if (state != null) {
-            p.get("state").setValue(state);
+            doc.setPropertyValue(XPATH_STATE, state);
         }
-        p.get("synchronized").setValue(new Date());
-        p.get("modified").setValue(remote.getLastModificationDate().getTime());
+        doc.setPropertyValue(XPATH_SYNCHRONIZED, new Date());
+        doc.setPropertyValue(XPATH_MODIFIED, remote.getLastModificationDate().getTime());
 
+        return doc;
     }
 
 }

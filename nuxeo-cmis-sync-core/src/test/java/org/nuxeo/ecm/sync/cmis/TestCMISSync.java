@@ -53,6 +53,7 @@ import org.nuxeo.ecm.core.test.annotations.Granularity;
 import org.nuxeo.ecm.core.test.annotations.RepositoryConfig;
 import org.nuxeo.ecm.platform.usermanager.UserManager;
 import org.nuxeo.ecm.sync.cmis.api.CMISRemoteService;
+import org.nuxeo.ecm.sync.cmis.api.CMISServiceConstants;
 import org.nuxeo.runtime.test.runner.Deploy;
 import org.nuxeo.runtime.test.runner.Features;
 import org.nuxeo.runtime.test.runner.FeaturesRunner;
@@ -150,14 +151,12 @@ public class TestCMISSync {
         doc.refresh();
 
         assertEquals(path, doc.getPathAsString());
-        assertEquals("remoteNuxeo", doc.getPropertyValue("cmissync:sync/connection"));
+        assertEquals("remoteNuxeo", doc.getPropertyValue("cmissync:connection"));
         assertEquals(526154, ((Blob) doc.getProperties("file").get("content")).getLength());
-        // log.debug(doc.getProperties("cmissync"));
-        // log.debug(doc.getProperties("dublincore"));
 
         // In distant Nuxeo test repo, members have ReadWrite on this document
         // It should have created a local specific CmisSync ACL
-        ACL acl = doc.getACP().getACL(CMISOperations.SYNC_ACL);
+        ACL acl = doc.getACP().getACL(CMISServiceConstants.SYNC_ACL);
         assertNotNull(acl);
         boolean membersCanReadWrite = false;
         boolean financeCanReadWrite = false;

@@ -76,8 +76,8 @@ public class DocumentListener implements EventListener, PostCommitEventListener 
 
     private boolean filterDoc(DocumentModel model) {
         return model != null && model.hasFacet("cmissync") && model.getPropertyValue("cmissync:uid") != null
-                && model.getPropertyValue("cmissync:sync/state") != null
-                && model.getPropertyValue("cmissync:sync/state").equals("queued");
+                && model.getPropertyValue("cmissync:state") != null
+                && model.getPropertyValue("cmissync:state").equals("queued");
     }
 
     private void execute(DocumentEventContext context) {

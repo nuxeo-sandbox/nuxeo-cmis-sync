@@ -2,24 +2,18 @@
 <xs:schema targetNamespace="http://www.nuxeo.org/ecm/schemas/cmissync/"
   xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:nxs="http://www.nuxeo.org/ecm/schemas/cmissync/">
 
-  <xs:element name="uid" type="xs:string"/>
-  <xs:element name="sync" type="nxs:sync"/>
-
-  <xs:complexType name="sync">
-    <xs:sequence>
-      <xs:element name="modified" type="xs:dateTime"/>
-      <xs:element name="synchronized" type="xs:dateTime"/>
-      <xs:element name="state" type="xs:string"/>
-      <xs:element name="type" type="xs:string"/>
-      <xs:element name="repository" type="xs:string"/>
-      <xs:element name="connection" type="xs:string"/>
-      <xs:element name="uri" type="xs:string"/>
-      <xs:element name="paths" type="nxs:pathlist"/>
-    </xs:sequence>
-  </xs:complexType>
+  <xs:element name="uid" type="xs:string" />
+  <xs:element name="modified" type="xs:dateTime" />
+  <xs:element name="synchronized" type="xs:dateTime" />
+  <xs:element name="state" type="xs:string" />
+  <xs:element name="type" type="xs:string" />
+  <xs:element name="repository" type="xs:string" />
+  <xs:element name="connection" type="xs:string" />
+  <xs:element name="uri" type="xs:string" />
+  <xs:element name="paths" type="nxs:pathlist" />
 
   <xs:simpleType name="pathlist">
-    <xs:list itemType="xs:string"/>
+    <xs:list itemType="xs:string" />
   </xs:simpleType>
 
 </xs:schema>

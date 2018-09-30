@@ -38,6 +38,8 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.sync.cmis.api.CMISRemoteService;
 
+import static org.nuxeo.ecm.sync.cmis.api.CMISServiceConstants.*;
+
 /**
  * Synchronize individual documents
  */
@@ -81,21 +83,22 @@ public class CMISImport extends CMISOperations {
         }
 
         // Validate repository
-        Property p = model.getProperty(SYNC_DATA);
+        Property p = model.getProperty(XPATH_CONNECTION);
         connection = validateConnection(p, connection);
 
         // Obtain Session from CMIS component
-        Session repo = createSession(p, cmis);
+        Property repositoryProperty = model.getProperty(XPATH_REPOSITORY);
+        Session repo = createSession(connection, repositoryProperty, cmis);
 
         // Retrieve object
         CmisObject remote = loadObject(repo, remoteRef.get(), idRef.get());
-        checkObject(remote, model, p);
+        checkObject(remote, model);
 
         // Import children of current path
         if (remote instanceof Folder) {
             Folder folder = (Folder) remote;
             for (CmisObject obj : folder.getChildren()) {
-                importObject(model, p, obj);
+                importObject(model, obj);
             }
         } else {
             log.warn("Remote object is not a folder: " + remote);
@@ -107,7 +110,7 @@ public class CMISImport extends CMISOperations {
         return model;
     }
 
-    private void importObject(DocumentModel model, Property p, CmisObject obj) {
+    private void importObject(DocumentModel model, CmisObject obj) {
         String docType = "Document";
         switch (obj.getBaseTypeId()) {
         case CMIS_DOCUMENT:
@@ -136,15 +139,15 @@ public class CMISImport extends CMISOperations {
             DocumentModel child = session.createDocumentModel(model.getPathAsString(), obj.getName(), docType);
             child.addFacet("cmissync");
             child.setPropertyValue("dc:title", obj.getName());
-            child.setPropertyValue(REMOTE_UID, obj.getId());
-            child.setPropertyValue(SYNC_DATA + "/type", obj.getBaseTypeId().value());
+            child.setPropertyValue(XPATH_REMOTE_UID, obj.getId());
+            child.setPropertyValue(XPATH_TYPE, obj.getBaseTypeId().value());
             if (obj instanceof FileableCmisObject) {
-                child.getProperty(SYNC_DATA + "/paths").setValue(((FileableCmisObject) obj).getPaths());
+                child.getProperty(XPATH_PATHS).setValue(((FileableCmisObject) obj).getPaths());
             }
 
-            child.setPropertyValue(SYNC_DATA + "/connection", connection);
-            child.setPropertyValue(SYNC_DATA + "/repository", p.getValue("repository"));
-            child.setPropertyValue(SYNC_DATA + "/state", state);
+            child.setPropertyValue(XPATH_CONNECTION, connection);
+            child.setPropertyValue(XPATH_REPOSITORY, model.getPropertyValue(XPATH_REPOSITORY));
+            child.setPropertyValue(XPATH_STATE, state);
 
             child = session.getOrCreateDocument(child);
         } catch (Exception ex) {

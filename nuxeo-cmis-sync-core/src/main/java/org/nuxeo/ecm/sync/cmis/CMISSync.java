@@ -54,6 +54,7 @@ import org.nuxeo.ecm.core.api.security.impl.ACLImpl;
 import org.nuxeo.ecm.core.api.security.impl.ACPImpl;
 import org.nuxeo.ecm.platform.usermanager.UserManager;
 import org.nuxeo.ecm.sync.cmis.api.CMISRemoteService;
+import org.nuxeo.ecm.sync.cmis.api.CMISServiceConstants;
 import org.nuxeo.ecm.sync.cmis.service.CMISMappingDescriptor;
 import org.nuxeo.runtime.api.Framework;
 
@@ -106,18 +107,19 @@ public class CMISSync extends CMISOperations {
         DocumentRef docRef = model.getRef();
 
         // Validate repository
-        Property p = model.getProperty(SYNC_DATA);
-        connection = validateConnection(p, connection);
+        Property connectionProperty = model.getProperty(CMISServiceConstants.XPATH_CONNECTION);
+        connection = validateConnection(connectionProperty, connection);
 
         // Obtain Session from CMIS component
-        Session repo = createSession(p, cmis);
+        Property repositoryProperty = model.getProperty(CMISServiceConstants.XPATH_REPOSITORY);
+        Session repo = createSession(connection, repositoryProperty, cmis);
 
         // Retrieve object
         CmisObject remote = loadObject(repo, remoteRef.get(), idRef.get());
-        checkObject(remote, model, p);
+        checkObject(remote, model);
 
         // Update document
-        if (requiresUpdate(remote, p, force)) {
+        if (requiresUpdate(remote, model, force)) {
             // Update fields
             List<CMISMappingDescriptor> descs = cmis.getMappings(model.getDocumentType().getName());
             for (CMISMappingDescriptor desc : descs) {
@@ -138,7 +140,7 @@ public class CMISSync extends CMISOperations {
                     blb.setFilename(rstream.getFileName());
                     blb.setMimeType(rstream.getMimeType());
                     DocumentHelper.addBlob(model.getProperty(contentXPath), blb);
-                    model.setPropertyValue(SYNC_DATA + "/uri", rdoc.getContentUrl());
+                    model.setPropertyValue(CMISServiceConstants.XPATH_URI, rdoc.getContentUrl());
                 } catch (IOException iox) {
                     log.warn("Unable to copy remote content", iox);
                 }
@@ -201,7 +203,7 @@ public class CMISSync extends CMISOperations {
                         }
                         if(needAddPermission) {
                             ACPImpl acp = new ACPImpl();
-                            ACLImpl nuxeoAcl = new ACLImpl(SYNC_ACL);
+                            ACLImpl nuxeoAcl = new ACLImpl(CMISServiceConstants.SYNC_ACL);
                             acp.addACL(nuxeoAcl);
                             ACE nuxeoAce = new ACE(principalId, localPerm, true);
                             nuxeoAcl.add(nuxeoAce);
@@ -214,7 +216,7 @@ public class CMISSync extends CMISOperations {
         }
 
         // Set sync attributes
-        updateSyncAttributes(remote, p, state);
+        updateSyncAttributes(remote, model, state);
 
         // Save and return
         model = coreSession.saveDocument(model);
