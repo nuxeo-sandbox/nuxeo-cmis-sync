@@ -28,10 +28,11 @@ import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.PostCommitEventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 import org.nuxeo.ecm.sync.cmis.api.CMISRemoteService;
+import org.nuxeo.ecm.sync.cmis.api.CMISServiceConstants;
 import org.nuxeo.ecm.sync.cmis.service.impl.CMISSyncService;
 import org.nuxeo.runtime.api.Framework;
 
-public class DocumentListener implements EventListener, PostCommitEventListener {
+public class DocumentListener implements EventListener, PostCommitEventListener, CMISServiceConstants {
 
     static final Log log = LogFactory.getLog(DocumentListener.class);
 
@@ -75,9 +76,9 @@ public class DocumentListener implements EventListener, PostCommitEventListener 
     }
 
     private boolean filterDoc(DocumentModel model) {
-        return model != null && model.hasFacet("cmissync") && model.getPropertyValue("cmissync:uid") != null
-                && model.getPropertyValue("cmissync:state") != null
-                && model.getPropertyValue("cmissync:state").equals("queued");
+        return model != null && model.hasFacet(SYNC_FACET) && model.getPropertyValue(XPATH_REMOTE_UID) != null
+                && model.getPropertyValue(XPATH_STATE) != null
+                && model.getPropertyValue(XPATH_STATE).equals("queued");
     }
 
     private void execute(DocumentEventContext context) {

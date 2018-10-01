@@ -23,28 +23,28 @@ package org.nuxeo.ecm.sync.cmis.api;
  *
  * @since 10.2
  */
-public class CMISServiceConstants {
+public interface CMISServiceConstants {
 
-    public static final String XPATH_REMOTE_UID = "cmissync:uid";
+    String XPATH_REMOTE_UID = "cmissync:uid";
 
-    public static final String XPATH_CONNECTION = "cmissync:connection";
+    String XPATH_CONNECTION = "cmissync:connection";
 
-    public static final String XPATH_REPOSITORY = "cmissync:repository";
+    String XPATH_REPOSITORY = "cmissync:repository";
 
-    public static final String XPATH_TYPE = "cmissync:type";
+    String XPATH_TYPE = "cmissync:type";
 
-    public static final String XPATH_PATHS = "cmissync:paths";
+    String XPATH_PATHS = "cmissync:paths";
 
-    public static final String XPATH_STATE = "cmissync:state";
+    String XPATH_STATE = "cmissync:state";
 
-    public static final String XPATH_SYNCHRONIZED = "cmissync:synchronized";
+    String XPATH_SYNCHRONIZED = "cmissync:synchronized";
 
-    public static final String XPATH_MODIFIED = "cmissync:modified";
+    String XPATH_MODIFIED = "cmissync:modified";
 
-    public static final String XPATH_URI = "cmissync:uri";
+    String XPATH_URI = "cmissync:uri";
 
-    public static final String SYNC_ACL = "CmisSync";
+    String SYNC_ACL = "CmisSync";
 
-    public static final String SYNC_FACET = "cmissync";
+    String SYNC_FACET = "CMISSync";
 
 }

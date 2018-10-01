@@ -112,7 +112,7 @@ Example:
           this.remotePath = "";
           this.uid = this.document.uid;
         }
-        if (this.configured == "no" && this.document && this.hasFacet(this.document, "cmissync")) {
+        if (this.configured == "no" && this.document && this.hasFacet(this.document, "CMISSync")) {
           var val = this.document.properties["cmissync:connection"];
           if (val) {
             this.connection = val;

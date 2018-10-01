@@ -18,8 +18,6 @@
  */
 package org.nuxeo.ecm.sync.cmis.service.impl;
 
-import static org.nuxeo.ecm.sync.cmis.api.CMISServiceConstants.*;
-
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -34,8 +32,9 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.sync.cmis.api.CMISRemoteService;
+import org.nuxeo.ecm.sync.cmis.api.CMISServiceConstants;
 
-public class CMISImportService extends CMISOperations {
+public class CMISImportService extends CMISOperations implements CMISServiceConstants {
 
     private static final Log log = LogFactory.getLog(CMISImportService.class);
 
@@ -62,7 +61,7 @@ public class CMISImportService extends CMISOperations {
     public DocumentModel run(DocumentModel target) {
 
         if (!target.isFolder()) {
-            throw new IllegalArgumentException("Cannot synchronize non-folderish documents");
+            throw new IllegalArgumentException("Cannot import non-folderish documents");
         }
 
         if (coreSession == null) {

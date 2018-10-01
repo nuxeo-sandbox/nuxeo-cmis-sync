@@ -59,7 +59,7 @@ import org.nuxeo.runtime.test.runner.FeaturesRunner;
 // @Ignore
 public class TestCMISImport {
 
-    private static final Log log = LogFactory.getLog(TestCMISImport.class);
+    static final Log log = LogFactory.getLog(TestCMISImport.class);
 
     @Inject
     protected CoreSession session;

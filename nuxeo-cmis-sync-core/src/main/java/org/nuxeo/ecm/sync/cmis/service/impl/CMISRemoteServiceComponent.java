@@ -30,6 +30,7 @@ import org.apache.chemistry.opencmis.client.SessionParameterMap;
 import org.apache.chemistry.opencmis.client.api.OperationContext;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.api.SessionFactory;
+import org.apache.chemistry.opencmis.client.runtime.OperationContextImpl;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
 import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.enums.BindingType;
@@ -46,7 +47,7 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
 
     public static final String EP_CONNECTION = "connection";
 
-    // Name of connection, Mapp of mapping name/values for this connection
+    // Name of connection, Map of mapping name/values for this connection
     protected Map<String, Map<String, CMISFieldMappingDescriptor>> fieldMapping = null;
 
     // Name of connection, ace-mapping for this connection
@@ -79,7 +80,7 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
             CMISConnectionDescriptor desc = (CMISConnectionDescriptor) contribution;
             String name = desc.getName();
 
-            log.debug("Registering connection: " + name + "n repository: " + desc.getRepository());
+            log.debug("Registering connection: " + name + ", repository: " + desc.getRepository());
 
             if (!desc.isEnabled()) {
                 connections.remove(name);
@@ -129,7 +130,7 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
         SessionParameterMap parameter = new SessionParameterMap(desc.getProperties());
         parameter.setBasicAuthentication(desc.getUsername(), desc.getCredentials());
         parameter.put(SessionParameter.REPOSITORY_ID, desc.getRepository());
-
+        
         String binding = desc.getBinding().toUpperCase();
         BindingType bt = BindingType.valueOf(binding);
         switch (bt) {
@@ -148,9 +149,11 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
 
         Session session = sessionFactory.createSession(parameter);
         // We want to fetch ACLs all the time. See getDefaultContext() doc. it's not
-        // Thread-safe, anbd must be set immediatly at creation time and before being used.
-        OperationContext oc = session.getDefaultContext();
+        // Thread-safe, and must be set immediately at creation time and before being used.
+        OperationContext oc = new OperationContextImpl();
         oc.setIncludeAcls(true);
+        oc.setLoadSecondaryTypeProperties(true);
+        oc.setIncludePolicies(true);
         session.setDefaultContext(oc);
 
         return session;

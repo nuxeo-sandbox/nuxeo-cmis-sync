@@ -40,7 +40,7 @@ public class CMISSync {
 
     public static final String ID = "Document.CMISSync";
 
-    private static final Log log = LogFactory.getLog(CMISSync.class);
+    static final Log log = LogFactory.getLog(CMISSync.class);
 
     @Context
     protected CoreSession coreSession;

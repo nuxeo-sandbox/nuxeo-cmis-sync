@@ -65,7 +65,7 @@ import org.nuxeo.runtime.test.runner.FeaturesRunner;
 @Deploy({ "org.nuxeo.ecm.sync.cmis", "org.nuxeo.ecm.sync.cmis:OSGI-INF/cmis-repository-test-contribs.xml" })
 public class TestCMISSync {
 
-    private static final Log log = LogFactory.getLog(TestCMISSync.class);
+    static final Log log = LogFactory.getLog(TestCMISSync.class);
 
     // WARNING: This user and group must exist in the distant repo
     public static final String TEST_USER = "john";

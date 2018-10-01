@@ -28,10 +28,11 @@ import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.PostCommitEventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 import org.nuxeo.ecm.sync.cmis.api.CMISRemoteService;
+import org.nuxeo.ecm.sync.cmis.api.CMISServiceConstants;
 import org.nuxeo.ecm.sync.cmis.service.impl.CMISImportService;
 import org.nuxeo.runtime.api.Framework;
 
-public class FolderishListener implements EventListener, PostCommitEventListener {
+public class FolderishListener implements EventListener, PostCommitEventListener, CMISServiceConstants {
 
     static final Log log = LogFactory.getLog(FolderishListener.class);
 
@@ -75,15 +76,15 @@ public class FolderishListener implements EventListener, PostCommitEventListener
     }
 
     private boolean filterDoc(DocumentModel model) {
-        return model != null && model.hasFacet("cmissync") && model.hasFacet("Folderish")
-                && model.getPropertyValue("cmissync:uid") != null
-                && model.getPropertyValue("cmissync:state") != null
-                && model.getPropertyValue("cmissync:state").equals("sync");
+        return model != null && model.hasFacet(SYNC_FACET) && model.hasFacet("Folderish")
+                && model.getPropertyValue(XPATH_REMOTE_UID) != null
+                && model.getPropertyValue(XPATH_STATE) != null
+                && model.getPropertyValue(XPATH_STATE).equals("sync");
     }
 
     private void execute(DocumentEventContext context) {
         DocumentModel model = context.getSourceDocument();
-        model.setPropertyValue("cmissync:state", "traversed");
+        model.setPropertyValue(XPATH_STATE, "traversed");
 
         CMISImportService imp = new CMISImportService(context.getCoreSession(), cmis);
         imp.setState("queued");

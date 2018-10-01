@@ -50,7 +50,7 @@ import org.nuxeo.ecm.sync.cmis.api.CMISRemoteService;
 import org.nuxeo.ecm.sync.cmis.api.CMISServiceConstants;
 import org.nuxeo.runtime.api.Framework;
 
-public class CMISSyncService extends CMISOperations {
+public class CMISSyncService extends CMISOperations implements CMISServiceConstants {
 
     private static final Log log = LogFactory.getLog(CMISSyncService.class);
 
@@ -89,11 +89,11 @@ public class CMISSyncService extends CMISOperations {
         DocumentRef docRef = model.getRef();
 
         // Validate repository
-        Property connectionProperty = model.getProperty(CMISServiceConstants.XPATH_CONNECTION);
+        Property connectionProperty = model.getProperty(XPATH_CONNECTION);
         connectionName = validateConnection(connectionProperty, connectionName);
 
         // Obtain Session from CMIS component
-        Property repositoryProperty = model.getProperty(CMISServiceConstants.XPATH_REPOSITORY);
+        Property repositoryProperty = model.getProperty(XPATH_REPOSITORY);
         Session repo = createSession(connectionName, repositoryProperty, cmis);
 
         // Retrieve object
@@ -122,7 +122,7 @@ public class CMISSyncService extends CMISOperations {
                     blb.setFilename(rstream.getFileName());
                     blb.setMimeType(rstream.getMimeType());
                     DocumentHelper.addBlob(model.getProperty(contentXPath), blb);
-                    model.setPropertyValue(CMISServiceConstants.XPATH_URI, rdoc.getContentUrl());
+                    model.setPropertyValue(XPATH_URI, rdoc.getContentUrl());
                 } catch (IOException iox) {
                     log.warn("Unable to copy remote content", iox);
                 }
@@ -185,7 +185,7 @@ public class CMISSyncService extends CMISOperations {
                         }
                         if(needAddPermission) {
                             ACPImpl acp = new ACPImpl();
-                            ACLImpl nuxeoAcl = new ACLImpl(CMISServiceConstants.SYNC_ACL);
+                            ACLImpl nuxeoAcl = new ACLImpl(SYNC_ACL);
                             acp.addACL(nuxeoAcl);
                             ACE nuxeoAce = new ACE(principalId, localPerm, true);
                             nuxeoAcl.add(nuxeoAce);

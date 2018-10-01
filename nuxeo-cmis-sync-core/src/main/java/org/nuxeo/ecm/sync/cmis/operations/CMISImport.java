@@ -39,7 +39,7 @@ public class CMISImport {
 
     public static final String ID = "Repository.CMISImport";
 
-    private static final Log log = LogFactory.getLog(CMISImport.class);
+    static final Log log = LogFactory.getLog(CMISImport.class);
 
     @Context
     protected CoreSession session;
@@ -76,43 +76,6 @@ public class CMISImport {
         DocumentModel result = cmisImport.run(target);
 
         return result;
-
-        /*
-        // Get document, check facet
-        AtomicReference<String> remoteRef = new AtomicReference<>(this.remoteRef);
-        AtomicBoolean idRef = new AtomicBoolean(this.idRef);
-        DocumentModel model = loadDocument(session, target, remoteRef, idRef);
-        if (!model.isFolder()) {
-            throw new IllegalArgumentException("Cannot synchronize non-folderish documents");
-        }
-
-        // Validate repository
-        Property p = model.getProperty(XPATH_CONNECTION);
-        connection = validateConnection(p, connection);
-
-        // Obtain Session from CMIS component
-        Property repositoryProperty = model.getProperty(XPATH_REPOSITORY);
-        Session repo = createSession(connection, repositoryProperty, cmis);
-
-        // Retrieve object
-        CmisObject remote = loadObject(repo, remoteRef.get(), idRef.get());
-        checkObject(remote, model);
-
-        // Import children of current path
-        if (remote instanceof Folder) {
-            Folder folder = (Folder) remote;
-            for (CmisObject obj : folder.getChildren()) {
-                importObject(model, obj);
-            }
-        } else {
-            log.warn("Remote object is not a folder: " + remote);
-            throw new IllegalArgumentException("Cannot import non-folder documents");
-        }
-
-        // Save and return
-        model = session.saveDocument(model);
-        return model;
-        */
     }
 
 }
