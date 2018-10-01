@@ -46,7 +46,7 @@ public class CMISRepositories extends AbstractJsonEnricher<DocumentModel> {
     public void write(JsonGenerator jg, DocumentModel doc) throws IOException {
         CMISRemoteService cmis = Framework.getService(CMISRemoteService.class);
         jg.writeFieldName(NAME);
-        jg.writeObject(cmis.getRepositoryNames());
+        jg.writeObject(cmis.getConnectionNames());
     }
 
 }

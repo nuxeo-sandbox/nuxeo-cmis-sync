@@ -102,26 +102,26 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
     }
 
     @Override
-    public List<CMISFieldMappingDescriptor> getFieldMapping(String connection, String doctype) {
-        Map<String, CMISFieldMappingDescriptor> fieldMappingMap = fieldMapping.get(connection);
+    public List<CMISFieldMappingDescriptor> getFieldMapping(String connectionName, String doctype) {
+        Map<String, CMISFieldMappingDescriptor> fieldMappingMap = fieldMapping.get(connectionName);
         return fieldMappingMap.values().stream().filter(m -> m.matches(doctype)).collect(Collectors.toList());
     }
 
     @Override
-    public Map<String, String> getAceMappings(String connection) {
-        return aceMapping.get(connection);
+    public Map<String, String> getAceMappings(String connectionName) {
+        return aceMapping.get(connectionName);
     }
 
     @Override
-    public Collection<String> getRepositoryNames() {
+    public Collection<String> getConnectionNames() {
         return Collections.unmodifiableSet(connections.keySet());
     }
 
     @Override
-    public Session createSession(String connection) {
-        CMISConnectionDescriptor desc = connections.get(connection);
+    public Session createSession(String connectionName) {
+        CMISConnectionDescriptor desc = connections.get(connectionName);
         if (desc == null) {
-            throw new IllegalArgumentException("No such connection: " + connection);
+            throw new IllegalArgumentException("No such connection: " + connectionName);
         }
 
         SessionFactory sessionFactory = SessionFactoryImpl.newInstance();
@@ -157,8 +157,8 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
     }
 
     @Override
-    public CMISConnectionDescriptor getConnectionDescriptor(String connection) {
-        return connections.get(connection);
+    public CMISConnectionDescriptor getConnectionDescriptor(String connectionName) {
+        return connections.get(connectionName);
     }
 
 }

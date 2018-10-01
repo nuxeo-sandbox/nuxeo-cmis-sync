@@ -27,21 +27,58 @@ import org.apache.chemistry.opencmis.client.api.Session;
 import org.nuxeo.ecm.sync.cmis.service.CMISConnectionDescriptor;
 import org.nuxeo.ecm.sync.cmis.service.CMISFieldMappingDescriptor;
 
+/**
+ * This service connects to a distant repository available via CMIS, and loads/provides mapping configuration
+ *
+ * @since 10.2
+ */
 public interface CMISRemoteService {
 
-    Session createSession(String name);
-
-    List<CMISFieldMappingDescriptor> getFieldMapping(String connection, String doctype);
-
     /**
+     * Creates and returns the OpenCmis Session given trhe connection name, and the corresponding parameters set in the
+     * XML configuration
      *
-     * @return (for the connection) an unmodifiable map of elements whose key is the remote ACE, value is the local ACE to apply
+     * @param name of the {@link CMISConnectionDescriptor}
+     * @return the created session
      * @since 10.2
      */
-    Map<String, String> getAceMappings(String connection);
+    Session createSession(String connectionName);
 
-    Collection<String> getRepositoryNames();
+    /**
+     * Returns the list of {@link CMISFieldMappingDescriptor} for the given connectionName
+     *
+     * @param connectionName name of the connection to use
+     * @param doctype the doc type. Passing null will return all the mapping
+     * @return a list of {@link CMISFieldMappingDescriptor}
+     * @since 10.2
+     */
+    List<CMISFieldMappingDescriptor> getFieldMapping(String connectionName, String doctype);
 
-    CMISConnectionDescriptor getConnectionDescriptor(String connection);
+    /**
+     * Returns the (unmodifiable) map of ACEs for the given connectionName
+     *
+     * @param connectionName name of the connection to use
+     * @return an unmodifiable map of elements whose key is the remote ACE, value is the local ACE
+     *         to apply
+     * @since 10.2
+     */
+    Map<String, String> getAceMappings(String connectionName);
+
+    /**
+     * Return the names of all the connections that have been loaded
+     *
+     * @return the names of all the connections that have been loaded
+     * @since 10.2
+     */
+    Collection<String> getConnectionNames();
+
+    /**
+     * Return the descriptor of a specific connection
+     *
+     * @param connectionName nam of a connection
+     * @return the descriptor for this connection
+     * @since 10.2
+     */
+    CMISConnectionDescriptor getConnectionDescriptor(String connectionName);
 
 }
