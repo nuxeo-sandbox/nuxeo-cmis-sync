@@ -18,72 +18,157 @@
  */
 package org.nuxeo.ecm.sync.cmis.service.impl;
 
+import static org.nuxeo.ecm.sync.cmis.api.CMISServiceConstants.*;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.apache.chemistry.opencmis.client.api.CmisObject;
+import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
+import org.apache.chemistry.opencmis.client.api.Folder;
+import org.apache.chemistry.opencmis.client.api.Session;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.CoreSession;
-import org.nuxeo.ecm.sync.cmis.CMISImport;
+import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.NuxeoException;
+import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.sync.cmis.api.CMISRemoteService;
 
-public class CMISImportService extends CMISImport {
+public class CMISImportService extends CMISOperations {
 
-    public CMISImportService(CoreSession session, CMISRemoteService cmis) {
+    private static final Log log = LogFactory.getLog(CMISImportService.class);
+
+    protected CoreSession coreSession;
+
+    protected CMISRemoteService cmis;
+
+    protected String connectionName;
+
+    protected String remoteRef;
+
+    protected boolean isIdRef = false;
+
+    protected boolean force = false;
+
+    protected String state;
+
+    public CMISImportService(CoreSession coreSession, CMISRemoteService cmis) {
         super();
-        this.session = session;
+        this.coreSession = coreSession;
         this.cmis = cmis;
     }
 
-    public CoreSession getSession() {
-        return session;
+    public DocumentModel run(DocumentModel target) {
+
+        if (!target.isFolder()) {
+            throw new IllegalArgumentException("Cannot synchronize non-folderish documents");
+        }
+
+        if (coreSession == null) {
+            coreSession = target.getCoreSession();
+            if (coreSession == null) {
+                throw new NuxeoException("No CoreSession available");
+            }
+        }
+
+        // Get document, check facet
+        AtomicReference<String> atomicRemoteRef = new AtomicReference<>(remoteRef);
+        AtomicBoolean idRef = new AtomicBoolean(isIdRef);
+        DocumentModel model = loadDocument(coreSession, target, atomicRemoteRef, idRef);
+
+        // Validate repository
+        Property p = model.getProperty(XPATH_CONNECTION);
+        connectionName = validateConnection(p, connectionName);
+
+        // Obtain Session from CMIS component
+        Property repositoryProperty = model.getProperty(XPATH_REPOSITORY);
+        Session repo = createSession(connectionName, repositoryProperty, cmis);
+
+        // Retrieve object
+        CmisObject remote = loadObject(repo, atomicRemoteRef.get(), idRef.get());
+        checkObject(remote, model);
+
+        // Import children of current path
+        if (remote instanceof Folder) {
+            Folder folder = (Folder) remote;
+            for (CmisObject obj : folder.getChildren()) {
+                importObject(model, obj);
+            }
+        } else {
+            log.warn("Remote object is not a folder: " + remote);
+            throw new IllegalArgumentException("Cannot import non-folder documents");
+        }
+
+        // Save and return
+        model = coreSession.saveDocument(model);
+        return model;
     }
 
-    public void setSession(CoreSession session) {
-        this.session = session;
+    private void importObject(DocumentModel model, CmisObject obj) {
+        String docType = "Document";
+        switch (obj.getBaseTypeId()) {
+        case CMIS_DOCUMENT:
+            docType = "File";
+            break;
+        case CMIS_FOLDER:
+            docType = "Folder";
+            break;
+        case CMIS_ITEM:
+            docType = "File";
+            break;
+        case CMIS_POLICY:
+            docType = "Policy";
+            break;
+        case CMIS_RELATIONSHIP:
+            docType = "Relationship";
+            break;
+        case CMIS_SECONDARY:
+            docType = "Secondary";
+            break;
+        default:
+            break;
+        }
+
+        try {
+            DocumentModel child = coreSession.createDocumentModel(model.getPathAsString(), obj.getName(), docType);
+            child.addFacet(SYNC_FACET);
+            child.setPropertyValue("dc:title", obj.getName());
+            child.setPropertyValue(XPATH_REMOTE_UID, obj.getId());
+            child.setPropertyValue(XPATH_TYPE, obj.getBaseTypeId().value());
+            if (obj instanceof FileableCmisObject) {
+                child.getProperty(XPATH_PATHS).setValue(((FileableCmisObject) obj).getPaths());
+            }
+
+            child.setPropertyValue(XPATH_CONNECTION, connectionName);
+            child.setPropertyValue(XPATH_REPOSITORY, model.getPropertyValue(XPATH_REPOSITORY));
+            child.setPropertyValue(XPATH_STATE, state);
+
+            child = coreSession.getOrCreateDocument(child);
+        } catch (Exception ex) {
+            log.error("Error creating document", ex);
+            throw new RuntimeException(ex);
+        }
     }
 
-    public CMISRemoteService getCmis() {
-        return cmis;
+    public void setState(String state) {
+        this.state = state;
     }
 
-    public void setCmis(CMISRemoteService cmis) {
-        this.cmis = cmis;
-    }
-
-    public String getConnection() {
-        return connection;
-    }
-
-    public void setConnection(String connection) {
-        this.connection = connection;
-    }
-
-    public String getRemoteRef() {
-        return remoteRef;
+    public void setConnectionName(String connectioName) {
+        connectionName = connectioName;
     }
 
     public void setRemoteRef(String remoteRef) {
         this.remoteRef = remoteRef;
     }
 
-    public boolean isIdRef() {
-        return idRef;
-    }
-
-    public void setIdRef(boolean idRef) {
-        this.idRef = idRef;
-    }
-
-    public boolean isForce() {
-        return force;
+    public void setIsIdRef(boolean isIdRef) {
+        this.isIdRef = isIdRef;
     }
 
     public void setForce(boolean force) {
         this.force = force;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
     }
 
 }

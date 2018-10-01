@@ -17,7 +17,7 @@
  *     Damon Brown
  *     Thibaud Arguillere
  */
-package org.nuxeo.ecm.sync.cmis.service;
+package org.nuxeo.ecm.sync.cmis.service.impl;
 
 import java.util.Collection;
 import java.util.Collections;

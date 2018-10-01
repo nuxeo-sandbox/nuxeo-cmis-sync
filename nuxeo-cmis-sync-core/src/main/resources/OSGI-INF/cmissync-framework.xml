@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <component name="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent">
-  <implementation class="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent" />
+  <implementation class="org.nuxeo.ecm.sync.cmis.service.impl.CMISRemoteServiceComponent" />
 
   <documentation>
     @author Damon Brown (dbrown@nuxeo.com)
@@ -40,7 +40,7 @@
         </connection>
       </code>
     </documentation>
-    <object class="org.nuxeo.ecm.sync.cmis.service.CMISConnectionDescriptor" />
+    <object class="org.nuxeo.ecm.sync.cmis.service.impl.CMISConnectionDescriptor" />
   </extension-point>
 
 </component>

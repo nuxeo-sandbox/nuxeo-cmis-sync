@@ -2,12 +2,12 @@
 <component name="org.nuxeo.ecm.sync.cmis.operation.cmissync" version="1.0">
 
   <extension target="org.nuxeo.ecm.core.operation.OperationServiceComponent" point="operations">
-    <operation class="org.nuxeo.ecm.sync.cmis.CMISImport"/>
-    <operation class="org.nuxeo.ecm.sync.cmis.CMISSync"/>
+    <operation class="org.nuxeo.ecm.sync.cmis.operations.CMISImport"/>
+    <operation class="org.nuxeo.ecm.sync.cmis.operations.CMISSync"/>
   </extension>
 
   <extension target="org.nuxeo.ecm.core.io.MarshallerRegistry" point="marshallers">
-    <register class="org.nuxeo.ecm.sync.cmis.CMISRepositories" enable="true"/>
+    <register class="org.nuxeo.ecm.sync.cmis.service.impl.CMISRepositories" enable="true"/>
   </extension>
 
   <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">

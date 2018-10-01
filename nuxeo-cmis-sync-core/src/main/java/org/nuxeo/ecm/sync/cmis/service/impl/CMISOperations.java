@@ -17,7 +17,7 @@
  *     Damon Brown
  *     Thibaud Arguillere
  */
-package org.nuxeo.ecm.sync.cmis;
+package org.nuxeo.ecm.sync.cmis.service.impl;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -83,8 +83,8 @@ public abstract class CMISOperations {
         return connection;
     }
 
-    protected Session createSession(String connection, Property repositoryProperty, CMISRemoteService cmis) {
-        Session repo = cmis.createSession(connection);
+    protected Session createSession(String connectionName, Property repositoryProperty, CMISRemoteService cmis) {
+        Session repo = cmis.createSession(connectionName);
         String repoId = repo.getRepositoryInfo().getId();
         if (repositoryProperty.getValue() == null) {
             repositoryProperty.setValue(repoId);

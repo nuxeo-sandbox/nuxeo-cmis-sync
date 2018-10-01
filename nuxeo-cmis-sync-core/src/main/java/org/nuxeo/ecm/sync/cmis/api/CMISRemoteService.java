@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.chemistry.opencmis.client.api.Session;
-import org.nuxeo.ecm.sync.cmis.service.CMISConnectionDescriptor;
-import org.nuxeo.ecm.sync.cmis.service.CMISFieldMappingDescriptor;
+import org.nuxeo.ecm.sync.cmis.service.impl.CMISConnectionDescriptor;
+import org.nuxeo.ecm.sync.cmis.service.impl.CMISFieldMappingDescriptor;
 
 /**
  * This service connects to a distant repository available via CMIS, and loads/provides mapping configuration

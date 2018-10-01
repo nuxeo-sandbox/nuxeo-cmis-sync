@@ -16,15 +16,8 @@
  * Contributors:
  *     Damon Brown
  */
-package org.nuxeo.ecm.sync.cmis;
+package org.nuxeo.ecm.sync.cmis.operations;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.apache.chemistry.opencmis.client.api.CmisObject;
-import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
-import org.apache.chemistry.opencmis.client.api.Folder;
-import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.automation.core.Constants;
@@ -35,16 +28,14 @@ import org.nuxeo.ecm.automation.core.annotations.Param;
 import org.nuxeo.ecm.automation.core.collectors.DocumentModelCollector;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.sync.cmis.api.CMISRemoteService;
-
-import static org.nuxeo.ecm.sync.cmis.api.CMISServiceConstants.*;
+import org.nuxeo.ecm.sync.cmis.service.impl.CMISImportService;
 
 /**
  * Synchronize individual documents
  */
 @Operation(id = CMISImport.ID, category = Constants.CAT_FETCH, label = "CMIS Structure Import", description = "Import CMIS content with a remote repository.")
-public class CMISImport extends CMISOperations {
+public class CMISImport {
 
     public static final String ID = "Repository.CMISImport";
 
@@ -74,6 +65,19 @@ public class CMISImport extends CMISOperations {
     @OperationMethod(collector = DocumentModelCollector.class)
     public DocumentModel run(DocumentModel target) {
 
+        CMISImportService cmisImport = new CMISImportService(session, cmis);
+
+        cmisImport.setConnectionName(connection);
+        cmisImport.setRemoteRef(remoteRef);
+        cmisImport.setIsIdRef(idRef);
+        cmisImport.setForce(force);
+        cmisImport.setState(state);
+
+        DocumentModel result = cmisImport.run(target);
+
+        return result;
+
+        /*
         // Get document, check facet
         AtomicReference<String> remoteRef = new AtomicReference<>(this.remoteRef);
         AtomicBoolean idRef = new AtomicBoolean(this.idRef);
@@ -108,52 +112,7 @@ public class CMISImport extends CMISOperations {
         // Save and return
         model = session.saveDocument(model);
         return model;
-    }
-
-    private void importObject(DocumentModel model, CmisObject obj) {
-        String docType = "Document";
-        switch (obj.getBaseTypeId()) {
-        case CMIS_DOCUMENT:
-            docType = "File";
-            break;
-        case CMIS_FOLDER:
-            docType = "Folder";
-            break;
-        case CMIS_ITEM:
-            docType = "File";
-            break;
-        case CMIS_POLICY:
-            docType = "Policy";
-            break;
-        case CMIS_RELATIONSHIP:
-            docType = "Relationship";
-            break;
-        case CMIS_SECONDARY:
-            docType = "Secondary";
-            break;
-        default:
-            break;
-        }
-
-        try {
-            DocumentModel child = session.createDocumentModel(model.getPathAsString(), obj.getName(), docType);
-            child.addFacet("cmissync");
-            child.setPropertyValue("dc:title", obj.getName());
-            child.setPropertyValue(XPATH_REMOTE_UID, obj.getId());
-            child.setPropertyValue(XPATH_TYPE, obj.getBaseTypeId().value());
-            if (obj instanceof FileableCmisObject) {
-                child.getProperty(XPATH_PATHS).setValue(((FileableCmisObject) obj).getPaths());
-            }
-
-            child.setPropertyValue(XPATH_CONNECTION, connection);
-            child.setPropertyValue(XPATH_REPOSITORY, model.getPropertyValue(XPATH_REPOSITORY));
-            child.setPropertyValue(XPATH_STATE, state);
-
-            child = session.getOrCreateDocument(child);
-        } catch (Exception ex) {
-            log.error("Error creating document", ex);
-            throw new RuntimeException(ex);
-        }
+        */
     }
 
 }

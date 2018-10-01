@@ -54,6 +54,7 @@ import org.nuxeo.ecm.core.test.annotations.RepositoryConfig;
 import org.nuxeo.ecm.platform.usermanager.UserManager;
 import org.nuxeo.ecm.sync.cmis.api.CMISRemoteService;
 import org.nuxeo.ecm.sync.cmis.api.CMISServiceConstants;
+import org.nuxeo.ecm.sync.cmis.operations.CMISSync;
 import org.nuxeo.runtime.test.runner.Deploy;
 import org.nuxeo.runtime.test.runner.Features;
 import org.nuxeo.runtime.test.runner.FeaturesRunner;

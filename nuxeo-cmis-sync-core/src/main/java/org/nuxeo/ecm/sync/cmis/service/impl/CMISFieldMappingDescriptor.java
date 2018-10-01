@@ -16,7 +16,7 @@
  * Contributors:
  *     Damon Brown
  */
-package org.nuxeo.ecm.sync.cmis.service;
+package org.nuxeo.ecm.sync.cmis.service.impl;
 
 import java.io.Serializable;
 

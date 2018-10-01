@@ -23,7 +23,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 
 import org.nuxeo.ecm.sync.cmis.api.CMISRemoteService;
-import org.nuxeo.ecm.sync.cmis.service.CMISConnectionDescriptor;
+import org.nuxeo.ecm.sync.cmis.service.impl.CMISConnectionDescriptor;
 
 /**
  * @since 10.2
