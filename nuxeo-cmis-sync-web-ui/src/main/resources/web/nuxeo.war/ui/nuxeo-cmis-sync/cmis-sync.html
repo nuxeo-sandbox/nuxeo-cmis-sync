@@ -46,13 +46,21 @@ Example:
       :host {
         display: inline-block;
       }
+
+      .synced {
+        color: var(--nuxeo-validated);
+      }
+
+      .unsync {
+        color: var(--nuxeo-warn-text);
+      }
     </style>
 
     <nuxeo-operation id="cmisSync" op="Document.CMISSync" input="[[document.uid]]" params="[[_params(connection, remotePath)]]"></nuxeo-operation>
 
     <template is="dom-if" if="[[_isAvailable(document)]]">
-      <paper-icon-button icon="[[icon]]" on-click="_toggleDialog" noink></paper-icon-button>
-      <paper-tooltip>Synchronize with CMIS</paper-tooltip>
+      <paper-icon-button class$="[[synced]]" icon="[[icon]]" on-click="_toggleDialog" noink></paper-icon-button>
+      <paper-tooltip>[[tooltip]]</paper-tooltip>
     </template>
 
     <nuxeo-dialog id="dialog" with-backdrop>
@@ -98,6 +106,16 @@ Example:
         configured: {
           type: String,
           value: "no"
+        },
+
+        synced: {
+          type: String,
+          value: ""
+        },
+
+        tooltip: {
+          type: String,
+          value: "Synchronize"
         }
       },
 
@@ -111,6 +129,8 @@ Example:
           this.connection = "";
           this.remotePath = "";
           this.uid = this.document.uid;
+          this.synced = "";
+          this.tooltip = "Synchronize";
         }
         if (this.configured == "no" && this.document && this.hasFacet(this.document, "CMISSync")) {
           var val = this.document.properties["cmissync:connection"];
@@ -126,12 +146,21 @@ Example:
               this.remotePath = val[0];
             }
           }
+
           if (this.connection !== "" && this.remotePath !== "") {
             this.configured = "yes";
-            console.log("CMIS configured");
+          }
+
+          // Check status
+          val = this.document.properties["cmissync:synchronized"];
+          if (val && val != "") {
+            this.synced = "synced";
+            this.tooltip = "Synchronized on " + new Date(Date.parse(val));
+          } else {
+            this.synced = "unsync";
           }
         } else if (this.configured !== "yes") {
-          console.log("CMIS Configured? " + this.configured);
+          this.synced = "";
           return;
         }
       },
@@ -156,21 +185,22 @@ Example:
 
       _sync: function () {
         if (this.document) {
-          console.log("Performing sync");
           this.$.cmisSync.execute().then(() => {
             this.fire('document-updated');
             this.fire('notify', {
               message: "Document Synchronized"
             });
+            this.synced = "synced";
           }).catch((error) => {
             console.log(error);
             this.configured = "error";
             this.fire('notify', {
               message: "Synchronization Failed: " + error
             });
+            this.synced = "unsync";
           });
         }
-      }
+      },
 
     });
   </script>

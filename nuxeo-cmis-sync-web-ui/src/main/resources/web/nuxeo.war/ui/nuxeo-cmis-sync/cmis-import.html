@@ -23,6 +23,7 @@ limitations under the License.
 <link rel="import" href="../../paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../../paper-input/paper-input.html">
 <link rel="import" href="../../paper-button/paper-button.html">
+<link rel="import" href="../widgets/nuxeo-dialog.html">
 <link rel="import" href="../nuxeo-i18n-behavior.html">
 <link rel="import" href="../nuxeo-filters-behavior.html">
 <link rel="import" href="../nuxeo-icons.html">
@@ -47,13 +48,23 @@ Example:
       }
     </style>
 
-    <nuxeo-operation id="cmisImport" op="Repository.CMISImport" input="[[document.uid]]" params="[[_params()]]"></nuxeo-operation>
+    <nuxeo-operation id="cmisImport" op="Repository.CMISImport" input="[[document.uid]]" params="[[_params(recursive)]]"></nuxeo-operation>
 
     <template is="dom-if" if="[[_isAvailable(document)]]">
-      <paper-icon-button icon="[[icon]]" on-click="_import" noink></paper-icon-button>
+      <paper-icon-button icon="[[icon]]" on-click="_toggleDialog" noink></paper-icon-button>
       <paper-tooltip>Import Remote Children</paper-tooltip>
     </template>
 
+    <nuxeo-dialog id="dialog" with-backdrop>
+      <h2>CMIS Import</h2>
+      <paper-checkbox noink checked="{{recursive}}">
+        Recursive?
+      </paper-checkbox>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button class="primary" dialog-confirm on-click="_import">Import</paper-button>
+      </div>
+    </nuxeo-dialog>
   </template>
   <script>
     Polymer({
@@ -67,6 +78,12 @@ Example:
           type: String,
           value: 'icons:settings-backup-restore'
         },
+
+        recursive: {
+          type: Boolean,
+          value: true
+        },
+
       },
 
       _isAvailable: function (document) {
@@ -75,15 +92,19 @@ Example:
 
       _params: function () {
         return {
-          "state": "queued"
+          "state": this.recursive ? "queued" : null
         };
+      },
+
+      _toggleDialog: function () {
+        this.$.dialog.toggle();
       },
 
       _import: function () {
         this.$.cmisImport.execute().then(() => {
           this.fire('document-updated');
           this.fire('notify', {
-            message: "Children Imported"
+            message: "Children Imported (" + (this.recursive ? "recursive" : "non-recursive") + ")"
           });
         });
       }

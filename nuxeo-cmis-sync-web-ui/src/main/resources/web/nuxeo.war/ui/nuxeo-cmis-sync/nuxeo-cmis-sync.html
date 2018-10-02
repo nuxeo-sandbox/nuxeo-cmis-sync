@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <link rel="import" href="cmis-sync.html">
+<link rel="import" href="cmis-sync-selection.html">
 <link rel="import" href="cmis-import.html">
 
 <nuxeo-slot-content name="cmis-sync" slot="DOCUMENT_ACTIONS" order="15">
@@ -33,5 +34,11 @@ limitations under the License.
         <cmis-import document="[[document]]" label="Import CMIS Content"></cmis-import>
       </template>
     </nuxeo-filter>
+  </template>
+</nuxeo-slot-content>
+
+<nuxeo-slot-content name="sync-selection-button" slot="RESULTS_SELECTION_ACTIONS" order="15">
+  <template>
+    <cmis-sync-selection documents="[[selectedItems]]"></cmis-sync-selection>
   </template>
 </nuxeo-slot-content>
