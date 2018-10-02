@@ -20,7 +20,6 @@ package org.nuxeo.ecm.sync.cmis.listeners;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.nuxeo.ecm.automation.AutomationService;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventBundle;
@@ -36,8 +35,6 @@ public class DocumentListener implements EventListener, PostCommitEventListener,
 
     static final Log log = LogFactory.getLog(DocumentListener.class);
 
-    protected AutomationService service;
-
     protected CMISRemoteService cmis;
 
     public DocumentListener() {
@@ -45,8 +42,7 @@ public class DocumentListener implements EventListener, PostCommitEventListener,
     }
 
     private void checkServices() {
-        if (service == null) {
-            service = Framework.getService(AutomationService.class);
+        if (cmis == null) {
             cmis = Framework.getService(CMISRemoteService.class);
         }
     }
