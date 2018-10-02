@@ -96,7 +96,7 @@ public class TestCMISImportOp {
     @Test
     public void shouldCallWithParameters() throws OperationException {
 
-        Assume.assumeTrue("No distant CMIS server can be reached", TestHelper.isTestCMISServerRunning(cmis, TestHelper.CONNECTION_NUXEO_RESET_PERMS));
+        Assume.assumeTrue("No distant CMIS server can be reached", TestHelper.isTestCMISServerRunning(cmis, TestHelper.CONNECTION_NUXEO_ADD_PERMS));
 
         final String remote = "/default-domain/workspaces/Documents";
 
@@ -106,11 +106,11 @@ public class TestCMISImportOp {
         OperationChain chain = new OperationChain("folderChain");
         chain.add(FetchContextDocument.ID);
         chain.add(CreateDocument.ID).set("type", "Folder").set("name", "folder").set("properties", "dc:title=AFolder");
-        chain.add(CMISSync.ID).set("connection", TestHelper.CONNECTION_NUXEO_RESET_PERMS).set("remoteRef", remote);
+        chain.add(CMISSync.ID).set("connection", TestHelper.CONNECTION_NUXEO_ADD_PERMS).set("remoteRef", remote);
         chain.add(CMISImport.ID).set("state", "imported");
         DocumentModel doc = (DocumentModel) service.run(ctx, chain);
         session.save();
-        assertEquals(TestHelper.CONNECTION_NUXEO_RESET_PERMS, doc.getPropertyValue(CMISServiceConstants.XPATH_CONNECTION));
+        assertEquals(TestHelper.CONNECTION_NUXEO_ADD_PERMS, doc.getPropertyValue(CMISServiceConstants.XPATH_CONNECTION));
 
         DocumentModelList dml = session.getChildren(doc.getRef());
         assertEquals(4, dml.size());

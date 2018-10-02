@@ -124,7 +124,7 @@ public class TestCMISSyncOp {
     @Test
     public void shouldCallWithParameters() throws OperationException {
 
-        Assume.assumeTrue("No distant CMIS server can be reached", TestHelper.isTestCMISServerRunning(cmis, TestHelper.CONNECTION_NUXEO_RESET_PERMS));
+        Assume.assumeTrue("No distant CMIS server can be reached", TestHelper.isTestCMISServerRunning(cmis, TestHelper.CONNECTION_NUXEO_ADD_PERMS));
 
         final String path = "/src/file";
         final String remote = REMOTE_DOC_PATH;
@@ -135,7 +135,7 @@ public class TestCMISSyncOp {
         OperationChain chain = new OperationChain("testChain");
         chain.add(FetchContextDocument.ID);
         chain.add(CreateDocument.ID).set("type", "File").set("name", "file").set("properties", "dc:title=MyDoc");
-        chain.add(CMISSync.ID).set("connection", TestHelper.CONNECTION_NUXEO_RESET_PERMS).set("remoteRef", remote);
+        chain.add(CMISSync.ID).set("connection", TestHelper.CONNECTION_NUXEO_ADD_PERMS).set("remoteRef", remote);
 
         DocumentModel doc = (DocumentModel) service.run(ctx, chain);
         session.save();
