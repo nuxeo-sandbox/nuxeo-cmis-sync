@@ -25,13 +25,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.nuxeo.common.xmap.annotation.XNode;
 import org.nuxeo.common.xmap.annotation.XNodeList;
 import org.nuxeo.common.xmap.annotation.XNodeMap;
 import org.nuxeo.common.xmap.annotation.XObject;
+import org.nuxeo.ecm.sync.cmis.api.CMISServiceConstants;
 
 @XObject("connection")
-public class CMISConnectionDescriptor implements Serializable {
+public class CMISConnectionDescriptor implements Serializable, CMISServiceConstants {
 
     private static final long serialVersionUID = 1L;
 
@@ -61,6 +63,9 @@ public class CMISConnectionDescriptor implements Serializable {
 
     @XNodeList(value="field-mapping", componentType = CMISFieldMappingDescriptor.class, type = ArrayList.class)
     protected List<CMISFieldMappingDescriptor> fieldMapping = new ArrayList<>();
+
+    @XNode("ace-mapping/method")
+    protected String aceMappingMethod = ACE_SYNC_METHOD_REPLACE;
 
     @XNodeMap(value = "ace-mapping/remoteAce", key = "@value", type = HashMap.class, componentType = String.class)
     protected Map<String, String> aceMapping = new HashMap<>();
@@ -143,6 +148,14 @@ public class CMISConnectionDescriptor implements Serializable {
 
     public List<CMISFieldMappingDescriptor> getFieldMapping() {
         return fieldMapping;
+    }
+
+    public String getAceMappingMethod() {
+        if (StringUtils.isBlank(aceMappingMethod)) {
+            aceMappingMethod = ACE_SYNC_METHOD_REPLACE;
+        }
+
+        return aceMappingMethod;
     }
 
 }

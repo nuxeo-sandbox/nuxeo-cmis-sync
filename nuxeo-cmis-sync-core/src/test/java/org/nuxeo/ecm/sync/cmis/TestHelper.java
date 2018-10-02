@@ -30,7 +30,9 @@ import org.nuxeo.ecm.sync.cmis.service.impl.CMISConnectionDescriptor;
  */
 public class TestHelper {
 
-    public static final String TEST_CONNECTION_REMOTE_NUXEO = "remoteNuxeo";
+    public static final String CONNECTION_NUXEO_RESET_PERMS = "remoteNuxeo";
+
+    public static final String CONNECTION_NUXEO_REPLACE_PERMS = "remoteNuxeoReplacePermissions";
 
     public static boolean isTestCMISServerRunning(CMISRemoteService cmis, String connection) {
 

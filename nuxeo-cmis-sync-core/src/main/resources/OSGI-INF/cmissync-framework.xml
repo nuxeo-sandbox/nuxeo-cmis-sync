@@ -28,11 +28,12 @@
           <field-mapping name="Copy coverage for files" xpath="dc:coverage" property="dc:coverage"
             doctype="File" />
           <field-mapping name="Update value for picture" xpath="c:c" property="prop_c" doctype="Picture" />
-          <field-mapping name="Map custom distant field for files" xpath="contractNum" property="customschema:contract"
-            doctype="File" />
+          <field-mapping name="Map custom distant field for files" xpath="contractNum"
+            property="customschema:contract" doctype="File" />
 
           <!-- Example of a list of ACE mapping -->
           <ace-mapping>
+            <method>addIfNotSet</method> <!--  other would be replaceAll -->
             <remoteAce value="permToRead">Read</remoteAce>
             <remoteAce value="permToWrite">ReadWrite</remoteAce>
             <remoteAce value="permFprAll">Everything</remoteAce>

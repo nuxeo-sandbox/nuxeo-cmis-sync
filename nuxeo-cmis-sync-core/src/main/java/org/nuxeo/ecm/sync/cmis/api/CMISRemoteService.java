@@ -21,9 +21,8 @@ package org.nuxeo.ecm.sync.cmis.api;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-
 import org.apache.chemistry.opencmis.client.api.Session;
+import org.nuxeo.ecm.sync.cmis.service.impl.CMISAceMapping;
 import org.nuxeo.ecm.sync.cmis.service.impl.CMISConnectionDescriptor;
 import org.nuxeo.ecm.sync.cmis.service.impl.CMISFieldMappingDescriptor;
 
@@ -55,14 +54,14 @@ public interface CMISRemoteService {
     List<CMISFieldMappingDescriptor> getFieldMapping(String connectionName, String doctype);
 
     /**
-     * Returns the (unmodifiable) map of ACEs for the given connectionName
+     * Returns ACEs mapping for the given connectionName, with the mapping methog
      *
      * @param connectionName name of the connection to use
-     * @return an unmodifiable map of elements whose key is the remote ACE, value is the local ACE
-     *         to apply
+     * @return ACEs mapping for the given connectionName. Contains elements whose key is the remote ACE, value is the
+     *         local ACE to apply
      * @since 10.2
      */
-    Map<String, String> getAceMappings(String connectionName);
+    CMISAceMapping getAceMappings(String connectionName);
 
     /**
      * Return the names of all the connections that have been loaded

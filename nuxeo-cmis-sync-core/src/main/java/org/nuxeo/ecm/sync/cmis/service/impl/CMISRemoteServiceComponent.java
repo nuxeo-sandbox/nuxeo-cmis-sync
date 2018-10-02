@@ -51,7 +51,7 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
     protected Map<String, Map<String, CMISFieldMappingDescriptor>> fieldMapping = null;
 
     // Name of connection, ace-mapping for this connection
-    protected Map<String, Map<String, String>> aceMapping = null;
+    protected Map<String, CMISAceMapping> aceMapping = null;
 
     protected Map<String, CMISConnectionDescriptor> connections = null;
 
@@ -88,8 +88,8 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
                 return;
             }
 
-            Map<String, String> loadedAceMapping = desc.getAceMapping();
-            aceMapping.put(name, Collections.unmodifiableMap(loadedAceMapping));
+            CMISAceMapping aceMappingMap = new CMISAceMapping(name, desc.getAceMappingMethod(), desc.getAceMapping());
+            aceMapping.put(name, aceMappingMap);
 
             List<CMISFieldMappingDescriptor> loadedFieldMapping = desc.getFieldMapping();
             Map<String, CMISFieldMappingDescriptor> fieldMappingMap = new HashMap<>();
@@ -109,7 +109,7 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
     }
 
     @Override
-    public Map<String, String> getAceMappings(String connectionName) {
+    public CMISAceMapping getAceMappings(String connectionName) {
         return aceMapping.get(connectionName);
     }
 
@@ -130,7 +130,7 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
         SessionParameterMap parameter = new SessionParameterMap(desc.getProperties());
         parameter.setBasicAuthentication(desc.getUsername(), desc.getCredentials());
         parameter.put(SessionParameter.REPOSITORY_ID, desc.getRepository());
-        
+
         String binding = desc.getBinding().toUpperCase();
         BindingType bt = BindingType.valueOf(binding);
         switch (bt) {

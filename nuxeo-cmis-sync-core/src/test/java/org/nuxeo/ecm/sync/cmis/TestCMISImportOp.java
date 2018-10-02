@@ -57,9 +57,9 @@ import org.nuxeo.runtime.test.runner.FeaturesRunner;
 @RepositoryConfig(init = DefaultRepositoryInit.class, cleanup = Granularity.METHOD)
 @Deploy({ "org.nuxeo.ecm.sync.cmis", "org.nuxeo.ecm.sync.cmis:OSGI-INF/cmis-repository-test-contribs.xml" })
 // @Ignore
-public class TestCMISImport {
+public class TestCMISImportOp {
 
-    static final Log log = LogFactory.getLog(TestCMISImport.class);
+    static final Log log = LogFactory.getLog(TestCMISImportOp.class);
 
     @Inject
     protected CoreSession session;
@@ -96,7 +96,7 @@ public class TestCMISImport {
     @Test
     public void shouldCallWithParameters() throws OperationException {
 
-        Assume.assumeTrue("No distant CMIS server can be reached", TestHelper.isTestCMISServerRunning(cmis, TestHelper.TEST_CONNECTION_REMOTE_NUXEO));
+        Assume.assumeTrue("No distant CMIS server can be reached", TestHelper.isTestCMISServerRunning(cmis, TestHelper.CONNECTION_NUXEO_RESET_PERMS));
 
         final String remote = "/default-domain/workspaces/Documents";
 
@@ -106,11 +106,11 @@ public class TestCMISImport {
         OperationChain chain = new OperationChain("folderChain");
         chain.add(FetchContextDocument.ID);
         chain.add(CreateDocument.ID).set("type", "Folder").set("name", "folder").set("properties", "dc:title=AFolder");
-        chain.add(CMISSync.ID).set("connection", TestHelper.TEST_CONNECTION_REMOTE_NUXEO).set("remoteRef", remote);
+        chain.add(CMISSync.ID).set("connection", TestHelper.CONNECTION_NUXEO_RESET_PERMS).set("remoteRef", remote);
         chain.add(CMISImport.ID).set("state", "imported");
         DocumentModel doc = (DocumentModel) service.run(ctx, chain);
         session.save();
-        assertEquals(TestHelper.TEST_CONNECTION_REMOTE_NUXEO, doc.getPropertyValue(CMISServiceConstants.XPATH_CONNECTION));
+        assertEquals(TestHelper.CONNECTION_NUXEO_RESET_PERMS, doc.getPropertyValue(CMISServiceConstants.XPATH_CONNECTION));
 
         DocumentModelList dml = session.getChildren(doc.getRef());
         assertEquals(4, dml.size());

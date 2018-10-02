@@ -63,9 +63,9 @@ import org.nuxeo.runtime.test.runner.FeaturesRunner;
 @Features(AutomationFeature.class)
 @RepositoryConfig(init = DefaultRepositoryInit.class, cleanup = Granularity.METHOD)
 @Deploy({ "org.nuxeo.ecm.sync.cmis", "org.nuxeo.ecm.sync.cmis:OSGI-INF/cmis-repository-test-contribs.xml" })
-public class TestCMISSync {
+public class TestCMISSyncOp {
 
-    static final Log log = LogFactory.getLog(TestCMISSync.class);
+    static final Log log = LogFactory.getLog(TestCMISSyncOp.class);
 
     // WARNING: This user and group must exist in the distant repo
     public static final String TEST_USER = "john";
@@ -124,7 +124,7 @@ public class TestCMISSync {
     @Test
     public void shouldCallWithParameters() throws OperationException {
 
-        Assume.assumeTrue("No distant CMIS server can be reached", TestHelper.isTestCMISServerRunning(cmis, TestHelper.TEST_CONNECTION_REMOTE_NUXEO));
+        Assume.assumeTrue("No distant CMIS server can be reached", TestHelper.isTestCMISServerRunning(cmis, TestHelper.CONNECTION_NUXEO_RESET_PERMS));
 
         final String path = "/src/file";
         final String remote = REMOTE_DOC_PATH;
@@ -135,7 +135,7 @@ public class TestCMISSync {
         OperationChain chain = new OperationChain("testChain");
         chain.add(FetchContextDocument.ID);
         chain.add(CreateDocument.ID).set("type", "File").set("name", "file").set("properties", "dc:title=MyDoc");
-        chain.add(CMISSync.ID).set("connection", TestHelper.TEST_CONNECTION_REMOTE_NUXEO).set("remoteRef", remote);
+        chain.add(CMISSync.ID).set("connection", TestHelper.CONNECTION_NUXEO_RESET_PERMS).set("remoteRef", remote);
 
         DocumentModel doc = (DocumentModel) service.run(ctx, chain);
         session.save();

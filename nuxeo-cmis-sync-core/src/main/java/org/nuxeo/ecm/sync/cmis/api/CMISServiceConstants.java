@@ -47,4 +47,8 @@ public interface CMISServiceConstants {
 
     String SYNC_FACET = "CMISSync";
 
+    String ACE_SYNC_METHOD_REPLACE = "replaceAll";
+
+    String ACE_SYNC_METHOD_ADD_IF_NOT_SET = "addIfNotSet";
+
 }
