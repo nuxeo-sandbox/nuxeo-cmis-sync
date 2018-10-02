@@ -19,27 +19,38 @@ mvn clean install
 
 
 ```
-  <extension target="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent" point="repository">
-    <repository name="test" enabled="true" binding="browser">
+  <extension target="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent" point="connection">
+    <connection name="test" enabled="true" binding="browser">
       <repository>default</repository>
-      <url>http://laptop:9090/nuxeo/json/cmis</url>
+      <url>http://some.server.com/nuxeo/json/cmis</url>
       <username>Administrator</username>
-      <credentials>Administrator</credentials>
-    </repository>
-  </extension>
+      <credentials>123</credentials>
+      <property key="prop1">123</property>
+      <property key="prop2">something</property>
 
-  <extension target="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent" point="mapping">
-    <mapping name="Copy Description for Everything" xpath="dc:description" property="dc:description"/>
-    <mapping name="Copy coverage for files" xpath="dc:coverage" property="dc:coverage" doctype="File"/>
-    <mapping name="Update value for picture" xpath="c:c" property="prop_c" doctype="Picture"/>
-  </extension>
+      <!-- Example of a list of ACE mapping -->
+      <field-mapping name="Copy Description for Everything" xpath="dc:description"
+            property="dc:description" />
+      <field-mapping name="Copy coverage for files" xpath="dc:coverage" property="dc:coverage"
+            doctype="File" />
+      <field-mapping name="Update value for picture" xpath="c:c" property="prop_c" doctype="Picture" />
+      <field-mapping name="Map custom distant field for files" xpath="contractNum" property="customschema:contract"
+            doctype="File" />
 
+      <!-- Example of a list of ACE mapping -->
+      <ace-mapping>
+        <remoteAce value="permToRead">Read</remoteAce>
+        <remoteAce value="permToWrite">ReadWrite</remoteAce>
+        <remoteAce value="permFprAll">Everything</remoteAce>
+      </ace-mapping>
+    </connection>
+  </extension>
 ```
 
 ## Operations
 
-`Document.CMISSync`: Synchronize individual pieces of content
-`Repository.CMISImport`: Import folder-based items from remote repositories
+- `Document.CMISSync`: Synchronize individual pieces of content
+- `Repository.CMISImport`: Import folder-based items from remote repositories
 
 ## Support
 
