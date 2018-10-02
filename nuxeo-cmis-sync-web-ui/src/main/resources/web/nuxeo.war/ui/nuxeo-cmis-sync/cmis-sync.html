@@ -56,6 +56,7 @@ Example:
       }
     </style>
 
+    <nuxeo-operation id="cmisConnections" op="Repository.CMISConnections" auto on-response="_parseConnections"></nuxeo-operation>
     <nuxeo-operation id="cmisSync" op="Document.CMISSync" input="[[document.uid]]" params="[[_params(connection, remotePath)]]"></nuxeo-operation>
 
     <template is="dom-if" if="[[_isAvailable(document)]]">
@@ -64,14 +65,31 @@ Example:
     </template>
 
     <nuxeo-dialog id="dialog" with-backdrop>
+      <!--
       <h2>CMIS Settings</h2>
-      <paper-input id="connection" label="Connection" value="{{connection}}" autofocus></paper-input>
+      <paper-input id="connection" label="Connection" value="{{connections}}" autofocus></paper-input>
       <paper-input id="remotePath" label="Remote Path" value="{{remotePath}}"></paper-input>
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button>
         <paper-button class="primary" dialog-confirm on-click="_sync">Synchronize</paper-button>
+      </div>-->
+
+      <nuxeo-select id="connection" label="Connection" selected="{{connection}}" attr-for-selected="key">
+        <dom-repeat items="[[connections]]" as="item">
+          <template>
+            <paper-item key="[[item]]">[[item]]</paper-item>
+          </template>
+        </dom-repeat>
+      </nuxeo-select>
+      <paper-input id="remotePath" label="Remote Path" value="{{remotePath}}"></paper-input>
+
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button class="primary" disabled="[[!selectedConnection]]" dialog-confirm on-click="_sync">Synchronize</paper-button>
       </div>
     </nuxeo-dialog>
+
+
   </template>
   <script>
     Polymer({
@@ -93,9 +111,12 @@ Example:
           value: 'icons:compare-arrows'
         },
 
+        connections: {
+          type: Array
+        },
+
         connection: {
           type: String,
-          value: ""
         },
 
         remotePath: {
@@ -121,6 +142,13 @@ Example:
 
       _isAvailable: function (document) {
         return document;
+      },
+
+      _parseConnections: function(response) {
+        this.connections = response.detail.response.value.split(',');
+        if (this.connections.length > 0) {
+          this.connection = this.connections[0];
+        }
       },
 
       _documentChanged: function () {
@@ -170,7 +198,6 @@ Example:
           this._sync();
         } else {
           this.$.dialog.toggle();
-          this.$.connection.inputElement.inputElement.select();
         }
       },
 

@@ -4,6 +4,7 @@
   <extension target="org.nuxeo.ecm.core.operation.OperationServiceComponent" point="operations">
     <operation class="org.nuxeo.ecm.sync.cmis.operations.CMISImport"/>
     <operation class="org.nuxeo.ecm.sync.cmis.operations.CMISSync"/>
+    <operation class="org.nuxeo.ecm.sync.cmis.operations.CMISConnections"/>
   </extension>
 
   <extension target="org.nuxeo.ecm.core.io.MarshallerRegistry" point="marshallers">
