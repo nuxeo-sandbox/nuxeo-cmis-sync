@@ -113,7 +113,7 @@ public abstract class CMISOperations {
         }
 
         if (remote == null) {
-            throw new IllegalArgumentException("Remote reference not found");
+            throw new IllegalArgumentException("Remote reference not found: " + remoteRef);
         }
 
         return remote;

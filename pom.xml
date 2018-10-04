@@ -16,11 +16,13 @@
   <modules>
     <module>nuxeo-cmis-sync-core</module>
     <module>nuxeo-cmis-sync-web-ui</module>
+    <module>nuxeo-cmis-sync-itests</module>
     <module>nuxeo-cmis-sync-package</module>
   </modules>
 
   <properties>
     <cmisVersion>1.1.0</cmisVersion>
+    <nuxeoVersion>10.2</nuxeoVersion>
   </properties>
 
   <repositories>
