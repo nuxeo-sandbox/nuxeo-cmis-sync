@@ -79,7 +79,7 @@ public class ITCMISImportOpTest extends BaseTest {
 
     @Before
     public void initRepo() throws Exception {
-        initDocuments();
+        initRemoteDocuments();
         assertNotNull(cmis);
 
         session.removeChildren(session.getRootDocument().getRef());
@@ -103,11 +103,11 @@ public class ITCMISImportOpTest extends BaseTest {
         OperationChain chain = new OperationChain("folderChain");
         chain.add(FetchContextDocument.ID);
         chain.add(CreateDocument.ID).set("type", "Folder").set("name", "folder").set("properties", "dc:title=AFolder");
-        chain.add(CMISSync.ID).set("connection", "remoteNuxeo").set("remoteRef", remote);
+        chain.add(CMISSync.ID).set("connection", CONNECTION_NUXEO_ADD_PERMS).set("remoteRef", remote);
         chain.add(CMISImport.ID).set("state", "imported");
         DocumentModel doc = (DocumentModel) service.run(ctx, chain);
         session.save();
-        assertEquals("remoteNuxeo", doc.getPropertyValue(CMISServiceConstants.XPATH_CONNECTION));
+        assertEquals(CONNECTION_NUXEO_ADD_PERMS, doc.getPropertyValue(CMISServiceConstants.XPATH_CONNECTION));
 
         DocumentModelList dml = session.getChildren(doc.getRef());
         assertEquals(3, dml.size());

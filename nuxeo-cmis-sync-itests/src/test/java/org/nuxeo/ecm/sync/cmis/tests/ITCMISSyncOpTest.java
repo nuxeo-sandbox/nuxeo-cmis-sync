@@ -17,6 +17,7 @@
 package org.nuxeo.ecm.sync.cmis.tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -32,7 +33,6 @@ import org.junit.runner.RunWith;
 import org.nuxeo.ecm.automation.AutomationService;
 import org.nuxeo.ecm.automation.OperationChain;
 import org.nuxeo.ecm.automation.OperationContext;
-import org.nuxeo.ecm.automation.OperationException;
 import org.nuxeo.ecm.automation.core.operations.FetchContextDocument;
 import org.nuxeo.ecm.automation.core.operations.document.CreateDocument;
 import org.nuxeo.ecm.automation.test.AutomationFeature;
@@ -42,6 +42,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.NuxeoPrincipal;
 import org.nuxeo.ecm.core.api.security.ACE;
 import org.nuxeo.ecm.core.api.security.ACL;
+import org.nuxeo.ecm.core.api.security.SecurityConstants;
 import org.nuxeo.ecm.core.event.EventService;
 import org.nuxeo.ecm.core.event.EventServiceAdmin;
 import org.nuxeo.ecm.core.test.DefaultRepositoryInit;
@@ -63,20 +64,10 @@ public class ITCMISSyncOpTest extends BaseTest {
 
     static final Log log = LogFactory.getLog(ITCMISSyncOpTest.class);
 
-    // WARNING: This user and group must exist in the distant repo
-    public static final String TEST_USER = "john";
-
-    public static final String TEST_GROUP = "Finance";
-
-    // WARNING: This document must exist in the distant repo and
-    // its permissions have:
-    // members can ReadWrite
-    // Finance can readWrite
-    // john can Everything
-    public static final String REMOTE_DOC_PATH = "/default-domain/workspaces/Documents/orbeon-demo.pptx";
+    static final String LOCAL_USER = "localuser1";
 
     @Inject
-    protected CoreSession session;
+    protected CoreSession coreSession;
 
     @Inject
     protected AutomationService service;
@@ -97,43 +88,48 @@ public class ITCMISSyncOpTest extends BaseTest {
 
     @Before
     public void initRepo() throws Exception {
-        initDocuments();
+
+        initRemoteDocuments();
 
         assertNotNull(cmis);
 
-        session.removeChildren(session.getRootDocument().getRef());
-        session.save();
+        coreSession.removeChildren(coreSession.getRootDocument().getRef());
+        coreSession.save();
 
-        src = session.createDocumentModel("/", "src", "Workspace");
+        src = coreSession.createDocumentModel("/", "src", "Workspace");
         src.setPropertyValue("dc:title", "Source");
-        src = session.createDocument(src);
-        session.save();
-        src = session.getDocument(src.getRef());
+        src = coreSession.createDocument(src);
+        coreSession.save();
+        src = coreSession.getDocument(src.getRef());
 
-        createGroup(TEST_GROUP);
-        createUser(TEST_USER);
-        NuxeoPrincipal principal = userManager.getPrincipal(TEST_USER);
-        principal.setGroups(Arrays.asList("members", TEST_GROUP));
+        createLocalGroup(GROUP1);
+        createLocalUser(USER1);
+        createLocalUser(LOCAL_USER);
+        NuxeoPrincipal principal = userManager.getPrincipal(USER1);
+        principal.setGroups(Arrays.asList(GROUP_MEMBERS, GROUP1));
         userManager.updateUser(principal.getModel());
 
     }
 
-    @Test
-    public void shouldCallWithParameters() throws OperationException {
+    protected DocumentModel syncAndCheckMetadata(String connectionName) throws Exception {
 
         final String path = "/src/file";
-        final String remote = FOLDER_2_FILE;
+        final String remote = TEST_FILE_PATH;
 
-        OperationContext ctx = new OperationContext(session);
+        OperationContext ctx = new OperationContext(coreSession);
         ctx.setInput(src);
 
         OperationChain chain = new OperationChain("testChain");
         chain.add(FetchContextDocument.ID);
-        chain.add(CreateDocument.ID).set("type", "File").set("name", "file").set("properties", "dc:title=MyDoc");
-        chain.add(CMISSync.ID).set("connection", "remoteNuxeo").set("remoteRef", remote);
+        chain.add(CreateDocument.ID).set("type", "File").set("name", "file").set("properties",
+                "dc:title=" + TEST_FILE_TITLE);
+        // ------------------------------> Add a permission for later check
+        chain.add("Document.AddPermission").set("permission", SecurityConstants.READ_WRITE).set("username", LOCAL_USER);
+        // ----------------------------------------------------------------
+        chain.add(CMISSync.ID).set("connection", connectionName).set("remoteRef", remote);
 
         DocumentModel doc = (DocumentModel) service.run(ctx, chain);
-        session.save();
+        coreSession.save();
 
         eventService.waitForAsyncCompletion();
         while (eventServiceAdmin.getEventsInQueueCount() > 0) {
@@ -146,42 +142,110 @@ public class ITCMISSyncOpTest extends BaseTest {
         }
         doc.refresh();
 
+        // Check values
         assertEquals(path, doc.getPathAsString());
-        assertEquals("remoteNuxeo", doc.getPropertyValue(CMISServiceConstants.XPATH_CONNECTION));
-        assertEquals(1012, ((Blob) doc.getProperties("file").get("content")).getLength());
+        assertEquals(connectionName, doc.getPropertyValue(CMISServiceConstants.XPATH_CONNECTION));
+        Blob blob = (Blob) doc.getPropertyValue("file:content");
+        assertNotNull(blob);
+        assertEquals(TEST_FILE_BLOB_NAME, blob.getFilename());
+        assertEquals(TEST_FILE_BLOB_SIZE, blob.getLength());
 
-        // In distant Nuxeo test repo, members have ReadWrite on this document
-        // It should have created a local specific CmisSync ACL
-        ACL acl = doc.getACP().getACL(CMISServiceConstants.SYNC_ACL);
-        assertNotNull(acl);
-        boolean membersCanReadWrite = false;
-        boolean financeCanReadWrite = false;
-        boolean johnCanEverything = false;
-        for (ACE ace : acl.getACEs()) {
-            if ("members".equals(ace.getUsername()) && "ReadWrite".equals(ace.getPermission())) {
-                membersCanReadWrite = true;
-            } else if (TEST_GROUP.equals(ace.getUsername()) && "ReadWrite".equals(ace.getPermission())) {
-                financeCanReadWrite = true;
-            } else if (TEST_USER.equals(ace.getUsername()) && "Everything".equals(ace.getPermission())) {
-                johnCanEverything = true;
+        return doc;
+    }
+
+    @Test
+    public void testCMISSyncOperationWithAddPermissions() throws Exception {
+
+        DocumentModel doc = syncAndCheckMetadata(CONNECTION_NUXEO_ADD_PERMS);
+
+        // Check permissions
+        // This has to be checked against what is created in BaseTest#initRemoteDocuments
+        // The service should have added the permission in a specifi ACL.
+        // We must have our permissions in this acl
+        ACL syncAcl= doc.getACP().getACL(CMISServiceConstants.SYNC_ACL);
+        assertNotNull(syncAcl);
+
+        boolean user1CanEverything = false;
+        boolean group1CanReadWrite = false;
+        boolean group1HasCustomPermission = false;
+
+        String aceUserName;
+        for (ACE ace : syncAcl.getACEs()) {
+            aceUserName = ace.getUsername();
+            if (GROUP1.equals(aceUserName)) {
+                if (SecurityConstants.READ_WRITE.equals(ace.getPermission())) {
+                    group1CanReadWrite = true;
+                } else if (CUSTOM_PERM_NOT_MAPPED.equals(ace.getPermission())) {
+                    group1HasCustomPermission = true;
+                }
+            } else if (USER1.equals(aceUserName) && "Everything".equals(ace.getPermission())) {
+                user1CanEverything = true;
             }
         }
-        assertTrue(membersCanReadWrite);
-        
-        // TODO check finance & john
-        //assertTrue(financeCanReadWrite);
-        //assertTrue(johnCanEverything);
+
+        assertTrue(user1CanEverything);
+        assertTrue(group1CanReadWrite);
+        assertTrue(group1HasCustomPermission);
+
+
+        // When the doc to sync was created, a permission was added (see syncAndCheckMetadata)
+        // and it must still exist when testing the CONNECTION_NUXEO_ADD_PERMS connection
+        NuxeoPrincipal principal = userManager.getPrincipal(LOCAL_USER);
+        boolean localUserCanReadWrite = coreSession.hasPermission(principal, doc.getRef(), SecurityConstants.READ_WRITE);;
+        assertTrue(localUserCanReadWrite);
 
     }
 
-    protected void createUser(String userId) {
+    @Test
+    public void testCMISSyncOperationWithReplacePermissions() throws Exception {
+
+        DocumentModel doc = syncAndCheckMetadata(CONNECTION_NUXEO_REPLACE_PERMS);
+
+        // Check permissions
+        // This has to be checked against what is created in BaseTest#initRemoteDocuments
+        // The service should have added the permission in a specifi ACL.
+        // We must have our permissions in this acl
+        ACL acl = doc.getACP().getACL(CMISServiceConstants.SYNC_ACL);
+        assertNotNull(acl);
+
+        boolean user1CanEverything = false;
+        boolean group1CanReadWrite = false;
+        boolean group1HasCustomPermission = false;
+
+        String aceUserName;
+        for (ACE ace : acl.getACEs()) {
+            aceUserName = ace.getUsername();
+            if (GROUP1.equals(aceUserName)) {
+                if (SecurityConstants.READ_WRITE.equals(ace.getPermission())) {
+                    group1CanReadWrite = true;
+                } else if (CUSTOM_PERM_NOT_MAPPED.equals(ace.getPermission())) {
+                    group1HasCustomPermission = true;
+                }
+            } else if (USER1.equals(aceUserName) && "Everything".equals(ace.getPermission())) {
+                user1CanEverything = true;
+            }
+        }
+
+        assertTrue(user1CanEverything);
+        assertTrue(group1CanReadWrite);
+        assertTrue(group1HasCustomPermission);
+
+        // When the doc to sync was created, a permission was added (see syncAndCheckMetadata)
+        // and it must not exist when testing the CONNECTION_NUXEO_REPLACE_PERMS connection
+        NuxeoPrincipal principal = userManager.getPrincipal(LOCAL_USER);
+        boolean localUserCanReadWrite = coreSession.hasPermission(principal, doc.getRef(), SecurityConstants.READ_WRITE);;
+        assertFalse(localUserCanReadWrite);
+
+    }
+
+    protected void createLocalUser(String userId) {
         DocumentModel userModel = userManager.getBareUserModel();
         userModel.setProperty("user", "username", userId);
         userModel.setProperty("user", "password", userId);
         userManager.createUser(userModel);
     }
 
-    protected void createGroup(String groupId) {
+    protected void createLocalGroup(String groupId) {
         DocumentModel groupModel = userManager.getBareGroupModel();
         groupModel.setProperty("group", "groupname", groupId);
         userManager.createGroup(groupModel);

@@ -32,6 +32,7 @@ import org.nuxeo.ecm.core.api.security.ACE;
 import org.nuxeo.ecm.core.api.security.ACL;
 import org.nuxeo.ecm.core.api.security.ACP;
 import org.nuxeo.ecm.core.api.security.Access;
+import org.nuxeo.ecm.core.api.security.SecurityConstants;
 import org.nuxeo.ecm.core.api.security.impl.ACLImpl;
 import org.nuxeo.ecm.core.api.security.impl.ACPImpl;
 import org.nuxeo.ecm.platform.usermanager.UserManager;
@@ -124,18 +125,28 @@ public class CMISAceMapping implements CMISServiceConstants {
         // Now, add the remote permissions
         List<Ace> remoteACEs = remote.getAcl() == null ? null : remote.getAcl().getAces();
         if (remoteACEs != null) {
+            //CPImpl newAcp = new ACPImpl();
+            ACLImpl nuxeoAcl = new ACLImpl(SYNC_ACL);
+            acp.addACL(nuxeoAcl);//newAcp.addACL(nuxeoAcl);
+
             for (Ace ace : remoteACEs) {
                 String principalId = ace.getPrincipalId();
                 Principal localPrincipal = getUserManager().getPrincipal(principalId);
                 boolean isGroup = false;
+                boolean isEveryone = false;
 
                 if (localPrincipal == null) {
                     isGroup = getUserManager().getGroup(principalId) != null;
                 }
 
                 if (localPrincipal == null && !isGroup) {
+                    isEveryone = SecurityConstants.EVERYONE.equals(principalId);
+                }
+
+                if (localPrincipal == null && !isGroup && !isEveryone) {
                     throw new NuxeoException("User/Group <" + principalId + "> not found");
                 }
+
                 for (String remotePerm : ace.getPermissions()) {
                     String localPerm = mapping.get(remotePerm);
                     if (localPerm == null) {
@@ -144,15 +155,11 @@ public class CMISAceMapping implements CMISServiceConstants {
                         localPerm = remotePerm;
                     }
 
-                    ACPImpl newAcp = new ACPImpl();
-                    ACLImpl nuxeoAcl = new ACLImpl(SYNC_ACL);
-                    newAcp.addACL(nuxeoAcl);
                     ACE nuxeoAce = new ACE(principalId, localPerm, true);
                     nuxeoAcl.add(nuxeoAce);
-                    coreSession.setACP(docRef, acp, false);
                 }
-
             }
+            coreSession.setACP(docRef, acp, false);
         }
 
 
@@ -171,12 +178,17 @@ public class CMISAceMapping implements CMISServiceConstants {
                 String principalId = ace.getPrincipalId();
                 Principal localPrincipal = getUserManager().getPrincipal(principalId);
                 boolean isGroup = false;
+                boolean isEveryone = false;
 
                 if (localPrincipal == null) {
                     isGroup = getUserManager().getGroup(principalId) != null;
                 }
 
                 if (localPrincipal == null && !isGroup) {
+                    isEveryone = SecurityConstants.EVERYONE.equals(principalId);
+                }
+
+                if (localPrincipal == null && !isGroup && !isEveryone) {
                     throw new NuxeoException("User/Group <" + principalId + "> not found");
                 }
 
