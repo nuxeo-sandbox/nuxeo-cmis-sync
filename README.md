@@ -13,19 +13,22 @@ The plugin provides a **configurable service** (with mappings for fields, doc ty
   * A field mapping
   * A permission mapping
 3. At any time later a document can be synchronized with its remote "sibling", fetching changes applied to the remote
-  * **IMPORTANT**: The local document fetches changes in the remote, it does not push any metadata, it is not a bi-way synchronization.
+  * **IMPORTANT**: The local document fetches changes in the remote, it does not push any metadata, it is not a bidirectional synchronization.
 
 The plugin contributes WebUI action buttons allowing a user to perform the initial importation, and — when needed — the individual updates.
 
 ### Technical Overview
+
 When importing a folder, the plugin adds a [`CMISSync`](nuxeo-cmis-sync-core/src/main/resources/OSGI-INF/CoreExtensions.xml) facet to the parent and to every imported child. This facet comes with a [`cmissync`](nuxeo-cmis-sync-core/src/main/resources/schema/cmissync.xsd) schema that gives information about the remote document linked to the local one (remote UID, URI, ...).
 
 ## Configuration / XML Contribution
 
 ### Overview
+
 The `connection` point of the `org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent` component allows for configuring:
 
 * Information about the remote server (URL, login, ...)
+  * Any CMIS [Session Parameter](https://chemistry.apache.org/java/javadoc/org/apache/chemistry/opencmis/commons/SessionParameter.html) may be set via the `property` element
 * Mapping for document types:
   * Map the remote doc type to a local one
   * When no mapping is provided, the plugin uses `File` or `Folder`
@@ -41,8 +44,17 @@ The `connection` point of the `org.nuxeo.ecm.sync.cmis.service.CMISRemoteService
 
 **it is possible to define as many as remote repository as needed, each of them with their own mappings**. The `name` property of the extension point is used as unique identifier for each connection.
 
+### Synchronization
+
+1. When a `Folderish` document is created with a CMIS synchronization state of `sync`:
+* The built-in listeners will perform an `CMISImport` of the immediate folder's children with a state of `queued` for each imported document.
+
+2. When any CMIS-enabled document is created with a CMIS synchronization state of `queued`:
+* The built-in listeners will perform a `CMISSync` of the document with a state of `sync`.
+* If the created document is `Folderish`, the recursion will continue (see #1).
 
 ### Example
+
 ```
 <extension target="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent"
            point="connection">
@@ -64,7 +76,7 @@ The `connection` point of the `org.nuxeo.ecm.sync.cmis.service.CMISRemoteService
       <!--  Example with custom doc types remote/local -->
       <doctype value="basecontract">Contract</doctype>
       <doctype value="pdfdoc">File</doctype>
-      <doctype value="claim_image">Picture</doctype>       
+      <doctype value="claim_image">Picture</doctype>
     </doctype-mapping>
 
     <!-- Example of a list of field mapping -->
@@ -86,18 +98,20 @@ The `connection` point of the `org.nuxeo.ecm.sync.cmis.service.CMISRemoteService
 
   <!-- Here, another connection -->
   <connection name="remoteRepository" enabled="true" binding="browser">
+    <property key="org.apache.chemistry.opencmis.binding.auth.http.oauth.bearer">abc1234</property>
     . . . etc . . .
   </connection>
   
 </extension>
 ```
 
+> Any [Apache Chemistry](https://chemistry.apache.org/) [session parameter](https://chemistry.apache.org/java/javadoc/org/apache/chemistry/opencmis/commons/SessionParameter.html) value can be set via the `property` element.
 
 ## Operations
 
-- `Repository.CMISConnections`: Return the list of connections set up in the XML configuration
-- `Repository.CMISImport`: Import folder-based items from remote repositories
-- `Document.CMISSync`: Synchronize individual pieces of content
+* `Repository.CMISConnections`: Return the list of connections set up in the XML configuration
+* `Repository.CMISImport`: Import folder-based items from remote repositories
+* `Document.CMISSync`: Synchronize individual pieces of content
 
 
 ## Build and Install (and Test)
@@ -107,18 +121,20 @@ Build with maven (at least 3.3)
 ```
 mvn clean install
 ```
+
 > Package built here: `nuxeo-cmis-sync-package/target`
 
 > Install with `nuxeoctl mp-install <package>`
 
 
 ### Testing/Unit-Testing
+
 For unit test with maven, the plugin deploys a Nuxeo distribution, starts it on port 8080, performs the tests, then stop the distribution. This means **the unit tests will fail if you already have a Nuxeo (or any application for that mater) running on localhost:8080**.
 
 To debug the unit tests from an IDE (Eclipse, ...); just start a nuxeo and make sur the test contribution can reach it (URL, login, password)
 
 ### Known Limitations
-* Support only for BASIC authentication
+
 * No fine-tuning of the mappings, no callbacks to adapt it dynamically (maybe based on the value of fields for example)
 
 ## Support

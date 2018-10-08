@@ -44,19 +44,19 @@ public class CMISConnectionDescriptor implements Serializable, CMISServiceConsta
     protected boolean enabled = true;
 
     @XNode("repository")
-    protected String repository;
+    protected String repository = null;
 
     @XNode("url")
-    protected String url = "";
+    protected String url = null;
 
     @XNode("@binding")
-    protected String binding;
+    protected String binding = null;
 
     @XNode("username")
-    protected String username = "";
+    protected String username = null;
 
     @XNode("credentials")
-    protected String credentials = "";
+    protected String credentials = null;
 
     @XNodeMap(value = "property", key = "@key", type = HashMap.class, componentType = String.class)
     protected Map<String, String> properties = new HashMap<>();

@@ -136,12 +136,19 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
         if (desc == null) {
             throw new IllegalArgumentException("No such connection: " + connectionName);
         }
+        if (desc.getUrl() == null) {
+            throw new IllegalArgumentException("No URL provided for connection: " + connectionName);
+        }
 
         SessionFactory sessionFactory = SessionFactoryImpl.newInstance();
 
         SessionParameterMap parameter = new SessionParameterMap(desc.getProperties());
-        parameter.setBasicAuthentication(desc.getUsername(), desc.getCredentials());
-        parameter.put(SessionParameter.REPOSITORY_ID, desc.getRepository());
+        if (desc.getUsername() != null && desc.getCredentials() != null) {
+            parameter.setBasicAuthentication(desc.getUsername(), desc.getCredentials());
+        }
+        if (desc.getRepository() != null) {
+            parameter.put(SessionParameter.REPOSITORY_ID, desc.getRepository());
+        }
 
         String binding = desc.getBinding().toUpperCase();
         BindingType bt = BindingType.valueOf(binding);
