@@ -21,6 +21,8 @@ package org.nuxeo.ecm.sync.cmis.api;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.nuxeo.ecm.sync.cmis.service.impl.CMISAceMapping;
 import org.nuxeo.ecm.sync.cmis.service.impl.CMISConnectionDescriptor;
@@ -42,6 +44,15 @@ public interface CMISRemoteService {
      * @since 10.2
      */
     Session createSession(String connectionName);
+
+    /**
+     * Returns the Map of remoteDoctype/localDoctype for the given connectionName
+     *
+     * @param connectionName name of the connection to use
+     * @return a map of remoteDoctype/localDoctype
+     * @since 10.2
+     */
+    public Map<String, String> getDoctypeMapping(String connectionName);
 
     /**
      * Returns the list of {@link CMISFieldMappingDescriptor} for the given connectionName

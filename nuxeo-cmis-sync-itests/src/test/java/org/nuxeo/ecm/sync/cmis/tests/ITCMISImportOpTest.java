@@ -54,7 +54,13 @@ import org.nuxeo.runtime.test.runner.FeaturesRunner;
 @RunWith(FeaturesRunner.class)
 @Features(AutomationFeature.class)
 @RepositoryConfig(init = DefaultRepositoryInit.class, cleanup = Granularity.METHOD)
-@Deploy({ "org.nuxeo.ecm.sync.cmis", "org.nuxeo.ecm.sync.cmis:OSGI-INF/cmis-repository-test-contribs.xml" })
+@Deploy({   "org.nuxeo.ecm.platform.picture.api",
+            "org.nuxeo.ecm.platform.picture.core",
+            "org.nuxeo.ecm.platform.picture.convert",
+            "org.nuxeo.ecm.platform.tag",
+            "org.nuxeo.ecm.platform.commandline.executor",
+        "org.nuxeo.ecm.platform.rendition.core", "org.nuxeo.ecm.sync.cmis",
+        "org.nuxeo.ecm.sync.cmis:OSGI-INF/cmis-repository-test-contribs.xml" })
 // @Ignore
 public class ITCMISImportOpTest extends BaseTest {
 
@@ -112,7 +118,31 @@ public class ITCMISImportOpTest extends BaseTest {
         assertEquals(CONNECTION_NUXEO_ADD_PERMS, doc.getPropertyValue(CMISServiceConstants.XPATH_CONNECTION));
 
         DocumentModelList dml = session.getChildren(doc.getRef());
-        assertEquals(3, dml.size());
+        assertEquals(5, dml.size());
+
+        // Check docTypes are ok with the mapping.
+        // In the test XML config, Video is converted to File
+        int countNote = 0;
+        int countPicture = 0;
+        int countFile = 0;
+        for(int i = 0; i < dml.size(); i++) {
+            switch(dml.get(i).getType()) {
+            case "File":
+                countFile += 1;
+                break;
+
+            case "Note":
+                countNote += 1;
+                break;
+
+            case "Picture":
+                countPicture += 1;
+                break;
+            }
+        }
+        assertEquals(3, countNote);
+        assertEquals(1, countPicture);
+        assertEquals(1, countFile);
 
         chain = new OperationChain("syncChain");
         for (DocumentModel dm : dml) {
@@ -132,7 +162,7 @@ public class ITCMISImportOpTest extends BaseTest {
         }
 
         dml = session.getChildren(doc.getRef());
-        assertEquals(3, dml.size());
+        assertEquals(5, dml.size());
 
     }
 }

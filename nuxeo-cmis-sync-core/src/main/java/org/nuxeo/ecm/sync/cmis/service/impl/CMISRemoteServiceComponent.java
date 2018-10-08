@@ -47,6 +47,9 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
 
     public static final String EP_CONNECTION = "connection";
 
+    // Name of connection, map of remoteDocType/localDocType for this connection
+    protected Map<String, Map<String, String>> doctypeMapping = null;
+
     // Name of connection, Map of mapping name/values for this connection
     protected Map<String, Map<String, CMISFieldMappingDescriptor>> fieldMapping = null;
 
@@ -61,6 +64,7 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
 
     @Override
     public void activate(ComponentContext context) {
+        doctypeMapping = new HashMap<>();
         fieldMapping = new HashMap<>();
         aceMapping = new HashMap<>();
         connections = new HashMap<>();
@@ -68,6 +72,7 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
 
     @Override
     public void deactivate(ComponentContext context) {
+        doctypeMapping = null;
         fieldMapping = null;
         aceMapping = null;
         connections = null;
@@ -87,6 +92,8 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
                 log.info("Connection configured to not be enabled: " + name);
                 return;
             }
+
+            doctypeMapping.put(name, desc.getDoctypeMapping());
 
             CMISAceMapping aceMappingMap = new CMISAceMapping(name, desc.getAceMappingMethod(), desc.getAceMapping());
             aceMapping.put(name, aceMappingMap);
@@ -116,6 +123,11 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
     @Override
     public Collection<String> getConnectionNames() {
         return Collections.unmodifiableSet(connections.keySet());
+    }
+
+    @Override
+    public Map<String, String> getDoctypeMapping(String connectionName) {
+        return doctypeMapping.get(connectionName);
     }
 
     @Override

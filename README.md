@@ -2,7 +2,22 @@
 
 [![Build Status](https://qa.nuxeo.org/jenkins/buildStatus/icon?job=Sandbox/sandbox_nuxeo-cmis-sync-master)](https://qa.nuxeo.org/jenkins/view/Sandbox/job/Sandbox/job/sandbox_nuxeo-cmis-sync-master/)
 
-Transparent CMIS synchronization by path
+Transparent CMIS synchronization by path. Current Nuxeo server is the _local_ server and it can fetch and synchronize with a remote repository, via CMIS.
+
+## Overview
+
+The plugin provides a **configurable service** and some **operations**, and the typical way it works is the following:
+
+1. Synchronize a remote folder with a local one (using the path to this remote folder). This imports the children, not yet fully synchronized
+2. The plugin installs listeners: When a document is created in the context of a CMIS Import, the listeners then automatically synchronize the local document with the remote one, applying:
+  * A field mapping
+  * A permission mapping
+3. At any time later a document can be synchronized with its remote "sibling", fetching changes applied to the remote
+  * **IMPORTANT**: The local document fetches changes in the remote, it does not push any metadata, it is not a bi-way synchronization.
+
+The plugin contributes WebUI action buttons allowing a user to perform the initial importation, and — when needed — the individual updates.
+
+
 
 ## Build and Install
 
@@ -51,6 +66,7 @@ mvn clean install
 
 - `Document.CMISSync`: Synchronize individual pieces of content
 - `Repository.CMISImport`: Import folder-based items from remote repositories
+- `Repository.CMISConnections`: Return the list of connections set up in the XML configuration
 
 ## Support
 

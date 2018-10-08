@@ -70,6 +70,9 @@ public class CMISConnectionDescriptor implements Serializable, CMISServiceConsta
     @XNodeMap(value = "ace-mapping/remoteAce", key = "@value", type = HashMap.class, componentType = String.class)
     protected Map<String, String> aceMapping = new HashMap<>();
 
+    @XNodeMap(value = "doctype-mapping/doctype", key = "@value", type = HashMap.class, componentType = String.class)
+    protected Map<String, String> doctypeMapping = new HashMap<>();
+
     public CMISConnectionDescriptor() {
         super();
     }
@@ -156,6 +159,10 @@ public class CMISConnectionDescriptor implements Serializable, CMISServiceConsta
         }
 
         return aceMappingMethod;
+    }
+
+    public Map<String, String> getDoctypeMapping() {
+        return doctypeMapping;
     }
 
 }

@@ -9,6 +9,16 @@
       <url>http://localhost:8080/nuxeo/json/cmis</url>
       <username>Administrator</username>
       <credentials>Administrator</credentials>
+      
+      <!-- In this test (Nuxeo -> Nuxeo) we map to the same doc type -->
+      <doctype-mapping>
+        <doctype value="File">File</doctype>
+        <doctype value="Note">Note</doctype>
+        <doctype value="Picture">Picture</doctype>
+        <!-- Video and Audio become File in this test -->
+        <doctype value="Video">File</doctype>
+        <doctype value="Audio">File</doctype>
+      </doctype-mapping>
 
       <field-mapping name="Copy Description for Everything" xpath="dc:description"
         property="dc:description" />

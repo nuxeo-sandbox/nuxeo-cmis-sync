@@ -98,7 +98,7 @@ public abstract class BaseTest {
                 Document folder = nuxeoClient.repository().fetchDocumentByPath("/folder_" + i);
                 nuxeoClient.repository().deleteDocument(folder);
             } catch (NuxeoClientRemoteException e) {
-                if(e.getStatus() == 404) {
+                if (e.getStatus() == 404) {
                     // All good, we can ignore that
                 } else {
                     throw e;
@@ -124,16 +124,34 @@ public abstract class BaseTest {
             nuxeoClient.repository().createDocumentByPath("/", doc);
         }
 
+        // ----------> Create 3 Note documents
+        Document doc;
         for (int i = 0; i < 3; i++) {
-            Document doc = Document.createWithName("note_" + i, "Note");
+            doc = Document.createWithName("note_" + i, "Note");
             doc.setPropertyValue("dc:title", "Note " + i);
             doc.setPropertyValue("note:note", "Note " + i);
             nuxeoClient.repository().createDocumentByPath("/folder_1", doc);
         }
+        // ----------> Add one Picture
+        doc = Document.createWithName("picture_1", "Picture");
+        doc.setPropertyValue("dc:title", "Picture 1");
+        nuxeoClient.repository().createDocumentByPath("/folder_1", doc);
+        File file = FileUtils.getResourceFileFromContext("sample.jpg");
+        org.nuxeo.client.objects.blob.FileBlob fileBlob = new FileBlob(file, file.getName(), "image/jpeg");
+        nuxeoClient.operation(BLOB_ATTACH_ON_DOCUMENT)
+                   .voidOperation(true)
+                   .param("document", "/folder_1/picture_1")
+                   .input(fileBlob)
+                   .execute();
 
-        // Create documents with permissions
+        // ----------> Add an empty Video Picture
+        doc = Document.createWithName("video_1", "Video");
+        doc.setPropertyValue("dc:title", "Video 1");
+        nuxeoClient.repository().createDocumentByPath("/folder_1", doc);
+
+        // ----------> Create documents with permissions
         // /folder_2/file1
-        Document doc = createDocument("/folder_2", "File", "file1", TEST_FILE_TITLE, "blob.json", "text/plain");
+        doc = createDocument("/folder_2", "File", "file1", TEST_FILE_TITLE, "blob.json", "text/plain");
         nuxeoClient.operation("Document.AddToFavorites").input(TEST_FILE_PATH).execute();
         // ----------------------- We block inheritance so we only have the permissions set later
         nuxeoClient.operation("Document.BlockPermissionInheritance").input(TEST_FILE_PATH).execute();

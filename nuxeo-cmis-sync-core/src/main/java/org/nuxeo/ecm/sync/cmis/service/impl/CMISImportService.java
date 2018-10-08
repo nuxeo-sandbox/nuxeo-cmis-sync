@@ -18,6 +18,7 @@
  */
 package org.nuxeo.ecm.sync.cmis.service.impl;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -25,6 +26,7 @@ import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.Session;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.CoreSession;
@@ -105,23 +107,36 @@ public class CMISImportService extends CMISOperations implements CMISServiceCons
     }
 
     private void importObject(DocumentModel model, CmisObject obj) {
+
+        if(StringUtils.isBlank(connectionName)) {
+            throw new IllegalArgumentException("connectioName was not initialized");
+        }
+
+        Map<String, String> doctypeMapping = cmis.getDoctypeMapping(connectionName);
+
         String docType = "Document";
+        String remoteDocType = obj.getType().getId();
         switch (obj.getBaseTypeId()) {
         case CMIS_DOCUMENT:
-            docType = "File";
+            docType = StringUtils.defaultIfBlank(doctypeMapping.get(remoteDocType), "File");
             break;
+
         case CMIS_FOLDER:
-            docType = "Folder";
+            docType = StringUtils.defaultIfBlank(doctypeMapping.get(remoteDocType), "Folder");
             break;
+
         case CMIS_ITEM:
-            docType = "File";
+            docType = StringUtils.defaultIfBlank(doctypeMapping.get(remoteDocType), "File");
             break;
+
         case CMIS_POLICY:
             docType = "Policy";
             break;
+
         case CMIS_RELATIONSHIP:
             docType = "Relationship";
             break;
+
         case CMIS_SECONDARY:
             docType = "Secondary";
             break;
