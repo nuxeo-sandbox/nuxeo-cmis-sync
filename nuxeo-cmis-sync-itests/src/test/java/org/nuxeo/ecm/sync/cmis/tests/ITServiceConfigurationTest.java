@@ -17,7 +17,7 @@
  *     Damon Brown
  *     Thibaud Arguillere
  */
-package org.nuxeo.ecm.sync.cmis.service;
+package org.nuxeo.ecm.sync.cmis.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -26,11 +26,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collection;
 import javax.inject.Inject;
 
-import org.apache.chemistry.opencmis.client.api.Session;
-import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.nuxeo.ecm.sync.cmis.TestHelper;
 import org.nuxeo.ecm.sync.cmis.api.CMISRemoteService;
 import org.nuxeo.ecm.sync.cmis.api.CMISServiceConstants;
 import org.nuxeo.ecm.sync.cmis.service.impl.CMISAceMapping;
@@ -47,21 +44,10 @@ import org.nuxeo.runtime.test.runner.RuntimeFeature;
 @RunWith(FeaturesRunner.class)
 @Features(RuntimeFeature.class)
 @Deploy({ "org.nuxeo.ecm.sync.cmis", "org.nuxeo.ecm.sync.cmis:OSGI-INF/cmis-repository-test-contribs.xml" })
-// @Ignore
-public class TestService {
+public class ITServiceConfigurationTest extends BaseTest {
 
     @Inject
     protected CMISRemoteService cmis;
-
-    @Test
-    public void testRepositoryConnection() throws Exception {
-
-        Assume.assumeTrue("No distant CMIS server can be reached", TestHelper.isTestCMISServerRunning(cmis, TestHelper.CONNECTION_NUXEO_ADD_PERMS));
-
-        Session ses = cmis.createSession(TestHelper.CONNECTION_NUXEO_ADD_PERMS);
-        assertNotNull(ses);
-        assertEquals("default", ses.getRepositoryInfo().getId());
-    }
 
     @Test
     public void testRepositoriesConfig() throws Exception {
@@ -69,26 +55,26 @@ public class TestService {
         // Connections
         Collection<String> connectionNames = cmis.getConnectionNames();
 
-        assertTrue(connectionNames.contains(TestHelper.CONNECTION_NUXEO_ADD_PERMS));
-        assertTrue(connectionNames.contains(TestHelper.CONNECTION_NUXEO_REPLACE_PERMS));
+        assertTrue(connectionNames.contains(BaseTest.CONNECTION_NUXEO_ADD_PERMS));
+        assertTrue(connectionNames.contains(BaseTest.CONNECTION_NUXEO_REPLACE_PERMS));
 
         // ACE mapping
-        CMISAceMapping aceMapping = cmis.getAceMappings(TestHelper.CONNECTION_NUXEO_ADD_PERMS);
+        CMISAceMapping aceMapping = cmis.getAceMappings(BaseTest.CONNECTION_NUXEO_ADD_PERMS);
         assertNotNull(aceMapping);
         assertEquals(CMISServiceConstants.ACE_SYNC_METHOD_ADD_IF_NOT_SET, aceMapping.getMethod());
 
-        aceMapping = cmis.getAceMappings(TestHelper.CONNECTION_NUXEO_REPLACE_PERMS);
+        aceMapping = cmis.getAceMappings(BaseTest.CONNECTION_NUXEO_REPLACE_PERMS);
         assertNotNull(aceMapping);
         assertEquals(CMISServiceConstants.ACE_SYNC_METHOD_REPLACE, aceMapping.getMethod());
 
         // Field mapping
         // We are testing the configuration. See cmis-repository-test-contribs.xml
         // 3 mappings in total. 1 for all, 1 for File, 1 for Picture
-        assertEquals(3, cmis.getFieldMapping(TestHelper.CONNECTION_NUXEO_ADD_PERMS, null).size());
-        assertEquals(1, cmis.getFieldMapping(TestHelper.CONNECTION_NUXEO_ADD_PERMS, "Document").size());
-        assertEquals(1, cmis.getFieldMapping(TestHelper.CONNECTION_NUXEO_ADD_PERMS, "Folder").size());
-        assertEquals(2, cmis.getFieldMapping(TestHelper.CONNECTION_NUXEO_ADD_PERMS, "File").size());
-        assertEquals(2, cmis.getFieldMapping(TestHelper.CONNECTION_NUXEO_ADD_PERMS, "Picture").size());
+        assertEquals(3, cmis.getFieldMapping(BaseTest.CONNECTION_NUXEO_ADD_PERMS, null).size());
+        assertEquals(1, cmis.getFieldMapping(BaseTest.CONNECTION_NUXEO_ADD_PERMS, "Document").size());
+        assertEquals(1, cmis.getFieldMapping(BaseTest.CONNECTION_NUXEO_ADD_PERMS, "Folder").size());
+        assertEquals(2, cmis.getFieldMapping(BaseTest.CONNECTION_NUXEO_ADD_PERMS, "File").size());
+        assertEquals(2, cmis.getFieldMapping(BaseTest.CONNECTION_NUXEO_ADD_PERMS, "Picture").size());
     }
 
 }

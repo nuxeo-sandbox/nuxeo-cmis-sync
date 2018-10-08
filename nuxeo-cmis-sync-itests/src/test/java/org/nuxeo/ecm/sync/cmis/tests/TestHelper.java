@@ -16,7 +16,7 @@
  * Contributors:
  *     Thibaud Arguillere
  */
-package org.nuxeo.ecm.sync.cmis;
+package org.nuxeo.ecm.sync.cmis.tests;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -29,10 +29,6 @@ import org.nuxeo.ecm.sync.cmis.service.impl.CMISConnectionDescriptor;
  * @since 10.2
  */
 public class TestHelper {
-
-    public static final String CONNECTION_NUXEO_ADD_PERMS = "remoteNuxeo";
-
-    public static final String CONNECTION_NUXEO_REPLACE_PERMS = "remoteNuxeoReplacePermissions";
 
     public static boolean isTestCMISServerRunning(CMISRemoteService cmis, String connection) {
 

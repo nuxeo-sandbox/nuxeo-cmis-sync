@@ -79,7 +79,9 @@ public class ITCMISImportOpTest extends BaseTest {
 
     @Before
     public void initRepo() throws Exception {
+
         initRemoteDocuments();
+
         assertNotNull(cmis);
 
         session.removeChildren(session.getRootDocument().getRef());
@@ -93,7 +95,7 @@ public class ITCMISImportOpTest extends BaseTest {
     }
 
     @Test
-    public void shouldCallWithParameters() throws OperationException {
+    public void shouldImportRemoteFolder() throws OperationException {
 
         final String remote = "/folder_1";
 

@@ -55,6 +55,8 @@ public abstract class BaseTest {
 
     public static final String CUSTOM_PERM_NOT_MAPPED = "CanDoThis";
 
+    public static final int COUNT_TEST_FOLDERS = 2;
+
     protected final NuxeoClient nuxeoClient = createClient().schemas("*");
 
     public BaseTest() {
@@ -89,14 +91,34 @@ public abstract class BaseTest {
         return new NuxeoClient.Builder().url(BASE_URL).authentication(authenticationMethod).timeout(60);
     }
 
+    public void resetRemoteDocuments() {
+        // see COUNT_TEST_FOLDERS() +> must delete the folders created there.
+        for (int i = 1; i <= COUNT_TEST_FOLDERS; i++) {
+            try {
+                Document folder = nuxeoClient.repository().fetchDocumentByPath("/folder_" + i);
+                nuxeoClient.repository().deleteDocument(folder);
+            } catch (NuxeoClientRemoteException e) {
+                if(e.getStatus() == 404) {
+                    // All good, we can ignore that
+                } else {
+                    throw e;
+                }
+            }
+        }
+
+    }
+
     public void initRemoteDocuments() {
 
         // Create user(s)/Group(s)
         createRemoteUser(nuxeoClient, USER1);
         createRemoteGroup(nuxeoClient, GROUP1);
 
+        // Reset previous data
+        resetRemoteDocuments();
+
         // Create documents
-        for (int i = 1; i < 3; i++) {
+        for (int i = 1; i <= COUNT_TEST_FOLDERS; i++) {
             Document doc = Document.createWithName("folder_" + i, "Folder");
             doc.setPropertyValue("dc:title", "Folder " + i);
             nuxeoClient.repository().createDocumentByPath("/", doc);
