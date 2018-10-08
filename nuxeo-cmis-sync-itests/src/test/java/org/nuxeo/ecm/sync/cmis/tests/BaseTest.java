@@ -144,7 +144,7 @@ public abstract class BaseTest {
                    .input(fileBlob)
                    .execute();
 
-        // ----------> Add an empty Video Picture
+        // ----------> Add an empty Video Picture, mapped to File in the test config
         doc = Document.createWithName("video_1", "Video");
         doc.setPropertyValue("dc:title", "Video 1");
         nuxeoClient.repository().createDocumentByPath("/folder_1", doc);

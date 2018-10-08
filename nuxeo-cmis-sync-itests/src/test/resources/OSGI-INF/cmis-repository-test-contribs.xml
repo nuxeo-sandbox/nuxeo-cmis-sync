@@ -10,7 +10,7 @@
       <username>Administrator</username>
       <credentials>Administrator</credentials>
       
-      <!-- In this test (Nuxeo -> Nuxeo) we map to the same doc type -->
+      <!-- In this test (Nuxeo -> Nuxeo) we map to the same doc types -->
       <doctype-mapping>
         <doctype value="File">File</doctype>
         <doctype value="Note">Note</doctype>
