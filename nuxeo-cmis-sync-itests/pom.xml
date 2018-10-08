@@ -138,6 +138,7 @@
         <nuxeo.distribution.version>10.2</nuxeo.distribution.version>
         <nuxeo.tested.version>[10.2,10.2HF01)</nuxeo.tested.version>
         <nuxeo.templates>default</nuxeo.templates>
+        <mp.install>nuxeo-web-ui,nuxeo-dam</mp.install>
       </properties>
       <dependencies>
         <dependency>
