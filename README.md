@@ -6,7 +6,7 @@ Transparent CMIS synchronization by path. Current Nuxeo server is the _local_ se
 
 ## Overview
 
-The plugin provides a **configurable service** and some **operations**, and the typical way it works is the following:
+The plugin provides a **configurable service** (with mappings for fields, doc types, and permissions) and some **operations**, and the typical way it works is the following:
 
 1. Synchronize a remote folder with a local one (using the path to this remote folder). This imports the children, not yet fully synchronized
 2. The plugin installs listeners: When a document is created in the context of a CMIS Import, the listeners then automatically synchronize the local document with the remote one, applying:
@@ -17,9 +17,90 @@ The plugin provides a **configurable service** and some **operations**, and the 
 
 The plugin contributes WebUI action buttons allowing a user to perform the initial importation, and — when needed — the individual updates.
 
+### Technical Overview
+When importing a folder, the plugin adds a [`CMISSync`](nuxeo-cmis-sync-core/src/main/resources/OSGI-INF/CoreExtensions.xml) facet to the parent and to every imported child. This facet comes with a [`cmissync`](nuxeo-cmis-sync-core/src/main/resources/schema/cmissync.xsd) schema that gives information about the remote document linked to the local one (remote UID, URI, ...).
+
+## Configuration / XML Contribution
+
+### Overview
+The `connection` point of the `org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent` component allows for configuring:
+
+* Information about the remote server (URL, login, ...)
+* Mapping for document types:
+  * Map the remote doc type to a local one
+  * When no mapping is provided, the plugin uses `File` or `Folder`
+* Mapping for fields:
+  * Which local field (`xpath`) to use to get the value stored in the remote one (`property`)
+  * Can be made either specific to a document type, or available for every imported document
+* Mapping for permissions:
+  * Set the synchronization method:
+    * `addIfNotSet` will add the permission, without changing the existing one.
+    * `replaceAll` will replace all permissions with the new one(s)
+  * And the mapping: NAme of the remote permission -> value in Nuxeo
+  * **WARNING**: In current implementation, if a user referenced in the remote document does not exist in current repository, the synchronization will fail.
+
+**it is possible to define as many as remote repository as needed, each of them with their own mappings**. The `name` property of the extension point is used as unique identifier for each connection.
 
 
-## Build and Install
+### Example
+```
+<extension target="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent"
+           point="connection">
+  <connection name="remoteNuxeo" enabled="true" binding="browser">
+    <repository>default</repository>
+    <url>http://localhost:8080/nuxeo/json/cmis</url>
+    <username>Administrator</username>
+    <credentials>Administrator</credentials>
+
+    <!-- Example of a list of Document Types mapping -->
+    <doctype-mapping>
+      <!--  Example when mapping between 2 Nuxeo repositories -->
+      <doctype value="File">File</doctype>
+      <doctype value="Note">Note</doctype>
+      <doctype value="Picture">Picture</doctype>
+      <doctype value="CustomContract">Contract</doctype>
+      <doctype value="Claim">Claim</doctype>
+      
+      <!--  Example with custom doc types remote/local -->
+      <doctype value="basecontract">Contract</doctype>
+      <doctype value="pdfdoc">File</doctype>
+      <doctype value="claim_image">Picture</doctype>       
+    </doctype-mapping>
+
+    <!-- Example of a list of field mapping -->
+    <field-mapping name="Copy Description for Everything" xpath="dc:description" property="dc:description" />
+    <field-mapping name="Copy coverage for files" xpath="dc:coverage" property="dc:coverage"
+      doctype="File" />
+    <field-mapping name="Update value for picture" xpath="c:c" property="prop_c" doctype="Picture" />
+
+    <!-- Example of a list of ACE mapping -->
+    <ace-mapping>
+      <method>addIfNotSet</method>
+      <remoteAce value="cmis:read">Read</remoteAce>
+      <remoteAce value="cmis:write">ReadWrite</remoteAce>
+      <remoteAce value="cmis:all">Everything</remoteAce>
+      <remoteAce value="Everything">Everything</remoteAce>
+    </ace-mapping>
+
+  </connection>
+
+  <!-- Here, another connection -->
+  <connection name="remoteRepository" enabled="true" binding="browser">
+    . . . etc . . .
+  </connection>
+  
+</extension>
+```
+
+
+## Operations
+
+- `Repository.CMISConnections`: Return the list of connections set up in the XML configuration
+- `Repository.CMISImport`: Import folder-based items from remote repositories
+- `Document.CMISSync`: Synchronize individual pieces of content
+
+
+## Build and Install (and Test)
 
 Build with maven (at least 3.3)
 
@@ -30,43 +111,15 @@ mvn clean install
 
 > Install with `nuxeoctl mp-install <package>`
 
-## Contributions
 
+### Testing/Unit-Testing
+For unit test with maven, the plugin deploys a Nuxeo distribution, starts it on port 8080, performs the tests, then stop the distribution. This means **the unit tests will fail if you already have a Nuxeo (or any application for that mater) running on localhost:8080**.
 
-```
-  <extension target="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent" point="connection">
-    <connection name="test" enabled="true" binding="browser">
-      <repository>default</repository>
-      <url>http://some.server.com/nuxeo/json/cmis</url>
-      <username>Administrator</username>
-      <credentials>123</credentials>
-      <property key="prop1">123</property>
-      <property key="prop2">something</property>
+To debug the unit tests from an IDE (Eclipse, ...); just start a nuxeo and make sur the test contribution can reach it (URL, login, password)
 
-      <!-- Example of a list of ACE mapping -->
-      <field-mapping name="Copy Description for Everything" xpath="dc:description"
-            property="dc:description" />
-      <field-mapping name="Copy coverage for files" xpath="dc:coverage" property="dc:coverage"
-            doctype="File" />
-      <field-mapping name="Update value for picture" xpath="c:c" property="prop_c" doctype="Picture" />
-      <field-mapping name="Map custom distant field for files" xpath="contractNum" property="customschema:contract"
-            doctype="File" />
-
-      <!-- Example of a list of ACE mapping -->
-      <ace-mapping>
-        <remoteAce value="permToRead">Read</remoteAce>
-        <remoteAce value="permToWrite">ReadWrite</remoteAce>
-        <remoteAce value="permFprAll">Everything</remoteAce>
-      </ace-mapping>
-    </connection>
-  </extension>
-```
-
-## Operations
-
-- `Document.CMISSync`: Synchronize individual pieces of content
-- `Repository.CMISImport`: Import folder-based items from remote repositories
-- `Repository.CMISConnections`: Return the list of connections set up in the XML configuration
+### Known Limitations
+* Support only for BASIC authentication
+* No fine-tuning of the mappings, no callbacks to adapt it dynamically (maybe based on the value of fields for example)
 
 ## Support
 
