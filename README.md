@@ -35,11 +35,13 @@ The `connection` point of the `org.nuxeo.ecm.sync.cmis.service.CMISRemoteService
 * Mapping for fields:
   * Which local field (`xpath`) to use to get the value stored in the remote one (`property`)
   * Can be made either specific to a document type, or available for every imported document
+  * Each field mapping has a unique `name` property
+    * The plugin provides [default mapping](nuxeo-cmis-sync-core/src/main/java/org/nuxeo/ecm/sync/cmis/service/impl/DefaultFieldMappings.java) (hard-coded) that can be overridden if needed
 * Mapping for permissions:
   * Set the synchronization method:
     * `addIfNotSet` will add the permission, without changing the existing one.
     * `replaceAll` will replace all permissions with the new one(s)
-  * And the mapping: NAme of the remote permission -> value in Nuxeo
+  * And the mapping: Name of the remote permission -> value in Nuxeo
   * **WARNING**: In current implementation, if a user referenced in the remote document does not exist in current repository, the synchronization will fail.
 
 **it is possible to define as many as remote repository as needed, each of them with their own mappings**. The `name` property of the extension point is used as unique identifier for each connection.
@@ -53,7 +55,7 @@ The `connection` point of the `org.nuxeo.ecm.sync.cmis.service.CMISRemoteService
 * The built-in listeners will perform a `CMISSync` of the document with a state of `sync`.
 * If the created document is `Folderish`, the recursion will continue (see #1).
 
-### Example
+### Configuration Example
 
 ```
 <extension target="org.nuxeo.ecm.sync.cmis.service.CMISRemoteServiceComponent"
@@ -136,6 +138,7 @@ To debug the unit tests from an IDE (Eclipse, ...); just start a nuxeo and make 
 ### Known Limitations
 
 * No fine-tuning of the mappings, no callbacks to adapt it dynamically (maybe based on the value of fields for example)
+* Not using the recent (9.10) Streams, so it will probably not ingest thousands of documents per second (anyway, the rate of ingestion also depends on the speed at which the remote application can find and send the documents)
 
 ## Support
 
