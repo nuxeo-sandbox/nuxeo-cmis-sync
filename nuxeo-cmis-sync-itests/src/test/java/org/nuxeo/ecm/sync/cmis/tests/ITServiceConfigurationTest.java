@@ -70,11 +70,11 @@ public class ITServiceConfigurationTest extends BaseTest {
         // Field mapping
         // We are testing the configuration. See cmis-repository-test-contribs.xml
         // 3 mappings in total. 1 for all, 1 for File, 1 for Picture
-        assertEquals(3, cmis.getFieldMapping(BaseTest.CONNECTION_NUXEO_ADD_PERMS, null).size());
-        assertEquals(1, cmis.getFieldMapping(BaseTest.CONNECTION_NUXEO_ADD_PERMS, "Document").size());
-        assertEquals(1, cmis.getFieldMapping(BaseTest.CONNECTION_NUXEO_ADD_PERMS, "Folder").size());
-        assertEquals(2, cmis.getFieldMapping(BaseTest.CONNECTION_NUXEO_ADD_PERMS, "File").size());
-        assertEquals(2, cmis.getFieldMapping(BaseTest.CONNECTION_NUXEO_ADD_PERMS, "Picture").size());
+        assertEquals(6, cmis.getFieldMapping(BaseTest.CONNECTION_NUXEO_ADD_PERMS, null).size());
+        assertEquals(4, cmis.getFieldMapping(BaseTest.CONNECTION_NUXEO_ADD_PERMS, "Document").size());
+        assertEquals(4, cmis.getFieldMapping(BaseTest.CONNECTION_NUXEO_ADD_PERMS, "Folder").size());
+        assertEquals(5, cmis.getFieldMapping(BaseTest.CONNECTION_NUXEO_ADD_PERMS, "File").size());
+        assertEquals(5, cmis.getFieldMapping(BaseTest.CONNECTION_NUXEO_ADD_PERMS, "Picture").size());
     }
 
 }
