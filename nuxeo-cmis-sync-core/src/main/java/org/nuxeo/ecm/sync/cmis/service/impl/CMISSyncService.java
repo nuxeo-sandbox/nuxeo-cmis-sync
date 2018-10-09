@@ -92,7 +92,8 @@ public class CMISSyncService extends CMISOperations implements CMISServiceConsta
         // Update document
         if (requiresUpdate(remote, model, force)) {
             // -------------------------------------> Update fields
-            List<CMISFieldMappingDescriptor> descs = cmis.getFieldMapping(connectionName, model.getDocumentType().getName());
+            List<CMISFieldMappingDescriptor> descs = cmis.getFieldMapping(connectionName,
+                    model.getDocumentType().getName());
             for (CMISFieldMappingDescriptor desc : descs) {
                 Object val = remote.getPropertyValue(desc.getProperty());
                 Property dp = model.getProperty(desc.getXpath());
@@ -107,11 +108,13 @@ public class CMISSyncService extends CMISOperations implements CMISServiceConsta
                 try {
                     Document rdoc = (Document) remote;
                     ContentStream rstream = rdoc.getContentStream();
-                    Blob blb = Blobs.createBlob(rstream.getStream());
-                    blb.setFilename(rstream.getFileName());
-                    blb.setMimeType(rstream.getMimeType());
-                    DocumentHelper.addBlob(model.getProperty(contentXPath), blb);
-                    model.setPropertyValue(XPATH_URI, rdoc.getContentUrl());
+                    if (rstream != null) {
+                        Blob blb = Blobs.createBlob(rstream.getStream());
+                        blb.setFilename(rstream.getFileName());
+                        blb.setMimeType(rstream.getMimeType());
+                        DocumentHelper.addBlob(model.getProperty(contentXPath), blb);
+                        model.setPropertyValue(XPATH_URI, rdoc.getContentUrl());
+                    }
                 } catch (IOException iox) {
                     log.warn("Unable to copy remote content", iox);
                 }
