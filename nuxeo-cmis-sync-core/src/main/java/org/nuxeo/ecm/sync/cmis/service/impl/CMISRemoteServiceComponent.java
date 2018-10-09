@@ -100,6 +100,9 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
 
             List<CMISFieldMappingDescriptor> loadedFieldMapping = desc.getFieldMapping();
             Map<String, CMISFieldMappingDescriptor> fieldMappingMap = new HashMap<>();
+            // Load default mappings (could be overridden)
+            DefaultFieldMappings.MAPPINGS.forEach(field -> fieldMappingMap.put(field.getName(), field));
+            // Load custom mappings
             loadedFieldMapping.forEach(oneDesc -> {
                 fieldMappingMap.put(oneDesc.getName(), oneDesc);
             });

@@ -44,6 +44,13 @@ public class CMISFieldMappingDescriptor implements Serializable {
         super();
     }
 
+    public CMISFieldMappingDescriptor(String name, String xpath, String property) {
+        super();
+        this.name = name;
+        this.xpath = xpath;
+        this.property = property;
+    }
+
     public String getName() {
         return name;
     }
