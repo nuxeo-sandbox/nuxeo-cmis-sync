@@ -87,6 +87,9 @@ The `connection` point of the `org.nuxeo.ecm.sync.cmis.service.CMISRemoteService
       doctype="File" />
     <field-mapping name="Update value for picture" xpath="c:c" property="prop_c" doctype="Picture" />
 
+    <!-- Example of user mapping -->
+    <user-mapping local="members" remote="GROUP_EVERYONE" type="group" />
+
     <!-- Example of a list of ACE mapping -->
     <ace-mapping>
       <method>addIfNotSet</method>

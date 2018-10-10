@@ -61,8 +61,11 @@ public class CMISConnectionDescriptor implements Serializable, CMISServiceConsta
     @XNodeMap(value = "property", key = "@key", type = HashMap.class, componentType = String.class)
     protected Map<String, String> properties = new HashMap<>();
 
-    @XNodeList(value="field-mapping", componentType = CMISFieldMappingDescriptor.class, type = ArrayList.class)
+    @XNodeList(value = "field-mapping", componentType = CMISFieldMappingDescriptor.class, type = ArrayList.class)
     protected List<CMISFieldMappingDescriptor> fieldMapping = new ArrayList<>();
+
+    @XNodeList(value = "user-mapping", componentType = CMISUserMappingDescriptor.class, type = ArrayList.class)
+    protected List<CMISUserMappingDescriptor> userMapping = new ArrayList<>();
 
     @XNode("ace-mapping/method")
     protected String aceMappingMethod = ACE_SYNC_METHOD_REPLACE;
@@ -163,6 +166,14 @@ public class CMISConnectionDescriptor implements Serializable, CMISServiceConsta
 
     public Map<String, String> getDoctypeMapping() {
         return doctypeMapping;
+    }
+
+    public List<CMISUserMappingDescriptor> getUserMapping() {
+        return userMapping;
+    }
+
+    public void setUserMapping(List<CMISUserMappingDescriptor> userMapping) {
+        this.userMapping = userMapping;
     }
 
 }

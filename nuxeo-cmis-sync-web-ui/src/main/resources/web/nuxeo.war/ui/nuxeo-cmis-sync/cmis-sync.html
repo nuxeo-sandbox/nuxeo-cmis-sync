@@ -65,14 +65,7 @@ Example:
     </template>
 
     <nuxeo-dialog id="dialog" with-backdrop>
-      <!--
       <h2>CMIS Settings</h2>
-      <paper-input id="connection" label="Connection" value="{{connections}}" autofocus></paper-input>
-      <paper-input id="remotePath" label="Remote Path" value="{{remotePath}}"></paper-input>
-      <div class="buttons">
-        <paper-button dialog-dismiss>Cancel</paper-button>
-        <paper-button class="primary" dialog-confirm on-click="_sync">Synchronize</paper-button>
-      </div>-->
 
       <nuxeo-select id="connection" label="Connection" selected="{{connection}}" attr-for-selected="key">
         <dom-repeat items="[[connections]]" as="item">

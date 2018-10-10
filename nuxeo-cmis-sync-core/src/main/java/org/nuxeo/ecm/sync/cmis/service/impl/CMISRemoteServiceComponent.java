@@ -95,7 +95,7 @@ public class CMISRemoteServiceComponent extends DefaultComponent implements CMIS
 
             doctypeMapping.put(name, desc.getDoctypeMapping());
 
-            CMISAceMapping aceMappingMap = new CMISAceMapping(name, desc.getAceMappingMethod(), desc.getAceMapping());
+            CMISAceMapping aceMappingMap = new CMISAceMapping(name, desc.getAceMappingMethod(), desc.getAceMapping(), desc.getUserMapping());
             aceMapping.put(name, aceMappingMap);
 
             List<CMISFieldMappingDescriptor> loadedFieldMapping = desc.getFieldMapping();
