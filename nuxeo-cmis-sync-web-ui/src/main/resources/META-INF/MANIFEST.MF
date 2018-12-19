@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 1
 Bundle-Name: Nuxeo CMIS Sync WebUI
-Bundle-SymbolicName: oorg.nuxeo.ecm.sync.cmis.webui;singleton:=true
+Bundle-SymbolicName: org.nuxeo.ecm.sync.cmis.webui;singleton:=true
 Bundle-Version: 1.0.0
 Bundle-Vendor: Nuxeo
 Nuxeo-Component: OSGI-INF/nuxeo-cmis-sync-webresources-contrib.xml

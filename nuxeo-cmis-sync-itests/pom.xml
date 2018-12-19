@@ -12,7 +12,7 @@
   <parent>
     <groupId>org.nuxeo.ecm.sync.cmis</groupId>
     <artifactId>nuxeo-cmis-sync</artifactId>
-    <version>10.2-SNAPSHOT</version>
+    <version>10.3-SNAPSHOT</version>
   </parent>
   <artifactId>nuxeo-cmis-sync-itests</artifactId>
   <name>Nuxeo CMIS Sync :: Integration Tests</name>
@@ -26,7 +26,7 @@
     <dependency>
       <groupId>org.nuxeo.client</groupId>
       <artifactId>nuxeo-java-client</artifactId>
-      <version>3.1.0</version>
+      <version>3.2.0</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -172,8 +172,8 @@
       <properties>
         <!-- TODO update this version to 10.x -->
         <!-- this version is used to get the base dependency graph to depend on the tested version -->
-        <nuxeo.distribution.version>10.2</nuxeo.distribution.version>
-        <nuxeo.tested.version>[10.2,10.2HF01)</nuxeo.tested.version>
+        <nuxeo.distribution.version>${nuxeoVersion}</nuxeo.distribution.version>
+        <nuxeo.tested.version>${nuxeoVersion}</nuxeo.tested.version>
         <nuxeo.templates>default</nuxeo.templates>
         <mp.install>nuxeo-dam</mp.install>
       </properties>

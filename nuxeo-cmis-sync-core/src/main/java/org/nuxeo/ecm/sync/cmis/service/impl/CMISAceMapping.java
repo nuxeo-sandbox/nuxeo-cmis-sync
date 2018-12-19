@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentRef;
+import org.nuxeo.ecm.core.api.NuxeoPrincipal;
 import org.nuxeo.ecm.core.api.security.ACE;
 import org.nuxeo.ecm.core.api.security.ACL;
 import org.nuxeo.ecm.core.api.security.ACP;
@@ -192,7 +193,7 @@ public class CMISAceMapping implements CMISServiceConstants {
             for (Ace ace : remoteACEs) {
                 String principalId = mapUser(ace.getPrincipalId());
 
-                Principal localPrincipal = getUserManager().getPrincipal(principalId);
+                NuxeoPrincipal localPrincipal = getUserManager().getPrincipal(principalId);
                 boolean isGroup = false;
                 boolean isEveryone = false;
 

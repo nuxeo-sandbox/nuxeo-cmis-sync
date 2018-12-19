@@ -4,12 +4,11 @@
   <parent>
     <groupId>org.nuxeo.ecm.sync.cmis</groupId>
     <artifactId>nuxeo-cmis-sync</artifactId>
-    <version>10.2-SNAPSHOT</version>
+    <version>10.3-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>nuxeo-cmis-sync-package</artifactId>
-  <version>10.2-SNAPSHOT</version>
   <packaging>zip</packaging>
   <name>Nuxeo CMIS Sync :: Package</name>
 
