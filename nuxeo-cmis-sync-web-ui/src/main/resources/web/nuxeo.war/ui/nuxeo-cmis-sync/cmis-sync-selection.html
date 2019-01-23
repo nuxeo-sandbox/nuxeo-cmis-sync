@@ -39,14 +39,13 @@ Example:
 
     <nuxeo-operation id="cmisSync" op="Document.CMISSync" sync-indexing></nuxeo-operation>
 
-    <template is="dom-if" if="[[_isAvailable(documents.splices)]]">
-      <paper-icon-button icon="[[_icon]]" id="cmisSyncButton">
-      </paper-icon-button>
-      <nuxeo-tooltip for="cmisSyncButton" position="[[tooltipPosition]]">
-        [[_tooltip]]
-      </nuxeo-tooltip>
+    <template is="dom-if" if="[[_isAvailable(document.splices)]]">
+      <div class="action" on-click="_toggleDialog">
+        <paper-icon-button icon="[[_icon]]" noink id="cmisSyncButton"></paper-icon-button>
+        <span class="label" hidden$="[[!showLabel]]">[[label]]</span>
+      </div>
+      <paper-tooltip>[[label]]</paper-tooltip>
     </template>
-
   </template>
   <script>
     Polymer({
@@ -70,9 +69,14 @@ Example:
           value: 'icons:compare-arrows'
         },
 
-        _tooltip: {
+        label: {
           type: 'String',
           value: 'Synchronize CMIS Documents'
+        },
+
+        showLabel: {
+          type: Boolean,
+          value: false
         }
       },
 

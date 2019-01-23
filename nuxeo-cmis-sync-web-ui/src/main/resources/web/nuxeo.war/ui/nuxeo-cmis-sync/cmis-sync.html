@@ -49,7 +49,7 @@ Example:
         <paper-icon-button class$="[[synced]]" icon="[[icon]]" noink></paper-icon-button>
         <span class="label" hidden$="[[!showLabel]]">[[label]]</span>
       </div>
-      <paper-tooltip>[[tooltip]]</paper-tooltip>
+      <paper-tooltip>[[label]]</paper-tooltip>
     </template>
 
     <nuxeo-dialog id="dialog" with-backdrop>
@@ -115,9 +115,14 @@ Example:
           value: ""
         },
 
-        tooltip: {
+        label: {
           type: String,
-          value: "Synchronize"
+          value: "Synchronize Content"
+        },
+
+        showLabel: {
+          type: Boolean,
+          value: false
         }
       },
 
