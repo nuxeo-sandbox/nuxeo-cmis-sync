@@ -5,7 +5,6 @@
     <groupId>org.nuxeo.ecm.sync.cmis</groupId>
     <artifactId>nuxeo-cmis-sync</artifactId>
     <version>10.10-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>nuxeo-cmis-sync-package</artifactId>
